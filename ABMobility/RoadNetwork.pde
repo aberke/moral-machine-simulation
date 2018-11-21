@@ -18,8 +18,8 @@ public class RoadNetwork {
      // Set map bounds -->
     setBoundingBox(JSONlines);
     
-    type=_type;
-    worldId=_worldId;
+    type = _type;
+    worldId = _worldId;
     
     // Import all nodes -->
     Node prevNode = null;
@@ -58,11 +58,10 @@ public class RoadNetwork {
           prevNode = newNode;
         }
       }
-    graph = new Pathfinder(nodes); 
-  }
+      graph = new Pathfinder(nodes); 
+    }
   }
 
-   // RETURN EXISTING NODE (SAME COORDINATES) IF EXISTS -->
   private Node nodeExists(float x, float y, ArrayList<Node> nodes) {
     for(Node node : nodes) {
       if(node.x == x && node.y == y) {
@@ -71,8 +70,7 @@ public class RoadNetwork {
     }
     return null;
   }
-  
-  // FIND NODES BOUNDS -->
+
   public void setBoundingBox(JSONArray JSONlines) {
   
     float minLng = 0;
@@ -95,7 +93,7 @@ public class RoadNetwork {
   }
   
   public void draw(PGraphics p){    
-    for(int i = 0; i < graph.nodes.size(); i++){
+    for (int i=0; i < graph.nodes.size(); i++){
       Node tempN = (Node)graph.nodes.get(i);
       for(int j = 0; j < tempN.links.size(); j++){
         if(showGlyphs){
@@ -113,25 +111,10 @@ public class RoadNetwork {
     }  
   }
   
-  public ArrayList<Node> getNodeInsideROI(PVector pos, int size){
-    ArrayList<Node> tmp = new ArrayList<Node>();
-    Node tmpNode; 
-    for (int i=0;i<graph.nodes.size();i++){
-      tmpNode = (Node) graph.nodes.get(i);
-      if(((tmpNode.x>pos.x-size/2) && (tmpNode.x)<pos.x+size/2) &&
-        ((tmpNode.y>pos.y-size/2) && (tmpNode.y)<pos.y+size/2))
-        {
-          tmp.add(tmpNode);
-        }       
-      }
-    return tmp;
-  }
-  
   public Node getRandomNodeInsideROI(PVector pos, int size){
     ArrayList<Node> tmp = new ArrayList<Node>();
     Node tmpNode; 
     for (int i=0;i<graph.nodes.size();i++){
-      
       tmpNode = (Node) graph.nodes.get(i);
         if(((tmpNode.x>pos.x-size/2) && (tmpNode.x)<pos.x+size/2) &&
         ((tmpNode.y>pos.y-size/2) && (tmpNode.y)<pos.y+size/2))
