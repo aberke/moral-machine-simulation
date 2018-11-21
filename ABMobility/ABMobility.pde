@@ -13,6 +13,8 @@ public int DISPLAY_HEIGHT = int(SIMULATION_HEIGHT * SCALE);
 public int playGroundWidth = DISPLAY_WIDTH;
 public int playGroundHeight = DISPLAY_HEIGHT;
 
+public final String BLOCKS_DATA_FILEPATH = "data/blocks.csv";
+
 public boolean INIT_AGENTS_FROM_DATAFILE = true;
 public final String SIMULATED_POPULATION_DATA_FILEPATH = "data/simPop.csv";
 public final int NUM_AGENTS_PER_WORLD = 1000;
@@ -25,14 +27,12 @@ boolean showGlyphs = true;
 boolean showNetwork = false;
 boolean showAgent = true;
 boolean showZombie = false;
-boolean dynamicSlider = true;
-boolean showCollisionPotential = false;
 
-void settings(){
+void settings() {
   fullScreen(P3D, SPAN);
 }
 
-void setup(){
+void setup() {
   drawer = new Drawer(this);
   drawer.initSurface();
   universe = new Universe();
@@ -40,35 +40,16 @@ void setup(){
   frameRate(30);
 } 
 
-void draw(){
-  drawScene();
-}
-
-/* Draw ------------------------------------------------------ */
-void drawScene() {
+void draw() {
   background(0);
   drawer.drawSurface();
 }
 
 void keyPressed() {
   switch(key) {
-    //Keystone trigger  
-  case 'k':
-    drawer.ks.toggleCalibration();
-    break;  
-  case 'l':
-    drawer.ks.load();
-    break; 
-  case 's':
-    drawer.ks.save();
-    break;
-  case 'c':
-    showCollisionPotential=!showCollisionPotential;
-  break;
   case 'b':
     showBuilding= !showBuilding;
   break;
-
   case ' ':
    showBackground=!showBackground;
   break;
@@ -78,12 +59,8 @@ void keyPressed() {
   case 'n':
     showNetwork = !showNetwork;
     break;
-  case 'd':
-    dynamicSlider = !dynamicSlider;
-    break;
   case 'z':
     showZombie=!showZombie;
     break;
-  
   }
 }

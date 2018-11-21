@@ -203,22 +203,8 @@ public class Agent {
     }
     
     if(showZombie & isZombie){
-            p.fill(#CC0000);
-            p.ellipse(pos.x, pos.y, 10*SCALE, 10*SCALE);
-     }
-    
-     if(showCollisionPotential) {
-       if(worldId==2){
-         for (Agent a: universe.world2.agents){
-           float dist = pos.dist(a.pos);
-           if (dist<20) {
-            p.stroke(lerpColor(universe.colorMapGood.get(mobilityType), universe.colorMapGood.get(a.mobilityType), 0.5));
-            p.strokeWeight(1);
-            p.line(pos.x, pos.y, a.pos.x, a.pos.y);
-            p.noStroke();
-          }
-        }
-       }
+      p.fill(#CC0000);
+      p.ellipse(pos.x, pos.y, 10*SCALE, 10*SCALE);
      }
   }
 

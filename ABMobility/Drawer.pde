@@ -1,6 +1,6 @@
 import deadpixel.keystone.*;
 
-public class Drawer{
+public class Drawer {
   Keystone ks;
   int nbProjector = 2;
   CornerPinSurface[] surface = new CornerPinSurface[nbProjector];

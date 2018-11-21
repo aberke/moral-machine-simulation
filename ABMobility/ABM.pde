@@ -123,9 +123,9 @@ public class World {
     agents = new ArrayList<Agent>();
 
     // Create the road networks.
-    RoadNetwork carNetwork = new RoadNetwork("network/current_network/car_"+id+".geojson", "car",id);
-    RoadNetwork bikeNetwork = new RoadNetwork("network/current_network/bike_"+id+".geojson", "bike",id);
-    RoadNetwork pedNetwork = new RoadNetwork("network/current_network/ped_"+id+".geojson", "ped",id);
+    RoadNetwork carNetwork = new RoadNetwork("network/current_network/car_"+id+".geojson", "car", id);
+    RoadNetwork bikeNetwork = new RoadNetwork("network/current_network/bike_"+id+".geojson", "bike", id);
+    RoadNetwork pedNetwork = new RoadNetwork("network/current_network/ped_"+id+".geojson", "ped", id);
     networks = new HashMap<String, RoadNetwork>();
     networks.put("car", carNetwork);
     networks.put("bike", bikeNetwork);
@@ -308,7 +308,7 @@ public class ABM {
   private int worldId;
   public color modelColor;
   
-  ABM(RoadNetwork _map, String _type, int _worldId){
+  ABM(RoadNetwork _map, String _type, int _worldId) {
     map=_map;
     type= _type;
     worldId= _worldId;
