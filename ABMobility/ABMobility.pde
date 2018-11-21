@@ -1,4 +1,4 @@
-State state = new State();
+
 Drawer drawer;
 
 float SCALE = 0.5;
@@ -27,7 +27,6 @@ boolean showAgent = true;
 boolean showZombie = false;
 boolean dynamicSlider = true;
 boolean showCollisionPotential = false;
-UDPReceiver udpR;
 
 void settings(){
   fullScreen(P3D, SPAN);
@@ -38,7 +37,6 @@ void setup(){
   drawer.initSurface();
   universe = new Universe();
   universe.InitUniverse();
-  udpR = new UDPReceiver();
   frameRate(30);
 } 
 
@@ -70,9 +68,6 @@ void keyPressed() {
   case 'b':
     showBuilding= !showBuilding;
   break;
-  case 't':
-    universe.grid.resetAnimation(); 
-  break;
 
   case ' ':
    showBackground=!showBackground;
@@ -90,16 +85,5 @@ void keyPressed() {
     showZombie=!showZombie;
     break;
   
-  }
-  
-  if (key == CODED) {
-    switch (keyCode){
-      case LEFT:
-      state.slider = max(state.slider - 0.05, 0); 
-      break;
-      case RIGHT:
-      state.slider = max(state.slider + 0.05, 0); 
-      break;
-    }
   }
 }

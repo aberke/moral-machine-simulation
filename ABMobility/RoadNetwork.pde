@@ -6,7 +6,7 @@ public class RoadNetwork {
   private Pathfinder graph;
   private String type;
   private int worldId;
-  /* <--- CONSTRUCTOR ---> */
+
   RoadNetwork(String GeoJSONfile, String _type, int _worldId) {
 
     ArrayList<Node> nodes = new ArrayList<Node>();

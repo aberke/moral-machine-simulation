@@ -1,8 +1,33 @@
-meta repo for cooper hewitt project
+This project is a fork of work done by the City Science team at MIT's Media Lab.  It originated as an interactive physical table + simulation for an exhibition at the Cooper Hewitt Museum.
 
-* the scanner has removed for simplicity
+Much credit goes to:
+[TODO: names]
 
-please clone separately from
+See https://github.com/CityScope/CS_Cooper-Hewitt
 
-https://github.com/RELNO/CityScope_Scanner_Python/tree/master
+
+# Moral Machines
+
+A simulation of two potential futures for autonomous vehicles (AVs):
+
+1. private
+
+A world where the streets and their vehicles operate as they do today.  Vehicles are privately owned consumer goods, driven to maximize safety and efficiency for their own passengers.
+
+
+2. public
+
+A world where AVs operate as shared transit.  They are programmed with new priorities for the streets.  Their driving algorithms are optimized to maximize public well being.  They always yield to pedestrians and bikers and other vehicles that carry more passengers.  In doing so, they increase:
+
+- road safety: yielding to higher occupancy vehicles and more vulnerable commuters (bikers and pedestrians) lowers the risk of harm to a greater number of people
+
+- incentives to bike or walk or use shared transit: when commutes become safer and more efficient for bikers, walkers, and shared transit, commuters are more likely to choose those modes of transit over private vehicles
+
+- environmental sustainability: fewer private vehicles on the road means less pollution
+
+
+
+### Run
+
+`source run.sh`
 

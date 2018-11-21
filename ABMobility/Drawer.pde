@@ -20,7 +20,7 @@ public class Drawer{
   }
   
   void drawSurface(){
-    universe.updateGraphics(state.slider);
+    universe.updateGraphics();
     offscreenSurface.beginDraw();
     offscreenSurface.clear();
     offscreenSurface.background(0);
@@ -30,7 +30,7 @@ public class Drawer{
     offscreenSurface.noFill();
     offscreenSurface.rect(playGroundWidth/2,playGroundHeight/2,2128*SCALE, 1330*SCALE);
     universe.update();
-    universe.draw(offscreenSurface,state.slider);
+    universe.draw(offscreenSurface);
     if(showBuilding){
        universe.grid.draw(offscreenSurface);
     }

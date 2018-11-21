@@ -13,7 +13,7 @@ public class Universe {
    HashMap<String, PImage[]> glyphsMap;
    Grid grid;
 
-   PShader s;
+   PShader shader;
    PGraphics pg;
    
    Universe(){
@@ -49,12 +49,11 @@ public class Universe {
      updatingWorld1 = false;
      updatingWorld2 = false;
 
-      s = loadShader("mask.glsl");
-      s.set("width", float(DISPLAY_WIDTH));
-      s.set("height", float(DISPLAY_HEIGHT));
-      s.set("left", world1.pg);
-      s.set("right", world2.pg);
-      s.set("divPoint", state.slider);
+      shader = loadShader("mask.glsl");
+      shader.set("width", float(DISPLAY_WIDTH));
+      shader.set("height", float(DISPLAY_HEIGHT));
+      shader.set("left", world1.pg);
+      shader.set("right", world2.pg);
      pg = createGraphics(DISPLAY_WIDTH, DISPLAY_HEIGHT, P2D);
    }
    
@@ -89,26 +88,19 @@ public class Universe {
     }
    }
 
-   void updateGraphics(float slider){
+  void updateGraphics() {
     world1.updateGraphics();
     world2.updateGraphics();
 
-    s.set("divPoint", slider);
     pg.beginDraw();
-    pg.shader(s);
+    pg.shader(shader);
     pg.rect(0, 0, pg.width, pg.height);
     pg.endDraw();
-   }
-   
-   void draw(PGraphics p, float slider){
-    int stitchEdge = Math.round(DISPLAY_WIDTH * slider);
+  }
+
+  void draw(PGraphics p) {
     p.image(pg, 0, 0);
-    // draw the center line
-    p.pushStyle();
-      p.stroke(255);
-      p.line(stitchEdge, 0, stitchEdge, DISPLAY_HEIGHT);
-    p.popStyle();
-   }
+  }
 }
 
 public class World {

@@ -15,7 +15,6 @@ public class Grid {
   // The buildings array is indexed by the ids of the buildings it holds.
   // i.e. it maps Building.id --> Building for buildings 0...24
   private ArrayList<Building> buildings;
-  private ArrayList<GridInteractionAnimation> gridAnimation;
   public HashMap<Integer, PVector> gridMap;
   HashMap<PVector,Integer> gridQRcolorMap;
 
@@ -39,7 +38,7 @@ public class Grid {
      gridQRcolorMap.put(gridMap.get(6),#888888);gridQRcolorMap.put(gridMap.get(7),#888888);gridQRcolorMap.put(gridMap.get(8),#CCCCCC);gridQRcolorMap.put(gridMap.get(9),#CCCCCC);gridQRcolorMap.put(gridMap.get(10),#888888);gridQRcolorMap.put(gridMap.get(11),#888888);
      gridQRcolorMap.put(gridMap.get(12),#888888);gridQRcolorMap.put(gridMap.get(13),#888888);gridQRcolorMap.put(gridMap.get(14),#CCCCCC);gridQRcolorMap.put(gridMap.get(15),#CCCCCC);gridQRcolorMap.put(gridMap.get(16),#888888);gridQRcolorMap.put(gridMap.get(17),#888888);
      
-     table = loadTable("block/Cooper Hewitt Buildings - Building Blocks.csv", "header");
+     table = loadTable("blocks.csv", "header");
      for (TableRow row : table.rows()) {
       // initialize buildings from data
       int id = row.getInt("id");
@@ -50,13 +49,9 @@ public class Grid {
       Building b = new Building(gridMap.get(loc), id, capacityR, capacityO, capacityA);
       buildings.add(b);
      }
-
-     gridAnimation = new ArrayList<GridInteractionAnimation>();
      
-     // is there a reason not using a simple for loop?
      int i = 0;
      for (Building b: buildings) {
-      gridAnimation.add(new GridInteractionAnimation(b.loc));
       i += 1;
       if (i >= 18) {
         break;
@@ -73,10 +68,6 @@ public class Grid {
         b.draw(p);
       }
     }
-    // Draw grid animations (if they occured)
-    for (GridInteractionAnimation ga: gridAnimation){
-      ga.draw(p);
-    }
   }
 
   public void drawBuildingBlocks(PGraphics p) {
@@ -91,68 +82,7 @@ public class Grid {
       p.rect(loc.x*GRID_CELL_SIZE+BUILDING_SIZE/2, loc.y*GRID_CELL_SIZE+BUILDING_SIZE/2, BUILDING_SIZE*0.9, BUILDING_SIZE*0.9);
     }
   }
-   
-   public void updateGridFromUDP(String message) {
-    // Take account of which buildings we have not seen in 
-    // the incoming message.
-    int[] buildingIdsFromData = new int[PHYSICAL_BUILDINGS_COUNT];
-    for (int i=0; i<PHYSICAL_BUILDINGS_COUNT; i++) {
-      buildingIdsFromData[i] = 0;
-    }
 
-    JSONObject json = parseJSONObject(message); 
-    JSONArray grids = json.getJSONArray("grid"); // maps building location --> Building
-    for(int i=0; i < grids.size(); i++) {
-      int buildingId = grids.getJSONArray(i).getInt(0);
-
-      if((buildingId >= 0) && (buildingId < PHYSICAL_BUILDINGS_COUNT)) {
-        Building building = buildings.get(buildingId);
-        
-        // building with buildingId is on the table
-        if (building.loc == zombieLandLocation) {
-          // building was previously not on table - it has just been put on table.
-          gridAnimation.get(i).put(buildingId);
-        }
-        building.loc = gridMap.get(i);
-        // Record that the building is on the grid
-        buildingIdsFromData[buildingId] = 1;
-      } else {
-        if (!gridAnimation.get(i).isPut) {
-          gridAnimation.get(i).take(buildingId);
-        }
-      }
-    }
-
-    for (int buildingId=0; buildingId<PHYSICAL_BUILDINGS_COUNT; buildingId++) {
-      if (buildingIdsFromData[buildingId] == 0) {
-        Building building = buildings.get(buildingId);
-        building.loc = zombieLandLocation;
-      }
-    }
-
-    if(dynamicSlider) {
-      JSONArray sliders = json.getJSONArray("slider");
-      state.slider = 1.0 - sliders.getFloat(0);
-
-    }   
-    
-    //FIXME: Keep this for now in case we want to keep the permanent special effect see issue #86
-    if(isBuildingInCurrentGrid(20)){
-      showGlyphs = false;
-    }else{
-      showGlyphs =true;
-    }
-    if(isBuildingInCurrentGrid(21)){
-      showNetwork = true;
-    }else{
-      showNetwork =false;
-    }
-    if(isBuildingInCurrentGrid(22)){
-      showCollisionPotential = true;
-    }else{
-      showCollisionPotential = false;
-    }
-  }
 
   public boolean isBuildingInCurrentGrid(int id){
     for (Building b: buildings){
@@ -175,9 +105,4 @@ public class Grid {
     return zombieLandLocation;
   }
 
-  public void resetAnimation(){
-    for(GridInteractionAnimation ga: gridAnimation){
-      ga.take(-1);
-    }
-  }
 }
