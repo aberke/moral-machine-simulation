@@ -1,21 +1,23 @@
 
 public class World {
+  PGraphics pg;
+
   // Networks is a mapping from network name to RoadNetwork.
   // e.g. "car" --> RoadNetwork, ... etc
   private HashMap<String, RoadNetwork> networks;
   private HashMap<String, PImage[]> glyphsMap;
   private ArrayList<Agent> agents;
+
+  // There are two backgrounds to show depending on world.
+  private PImage background_private_world;
+  private PImage background_public_world;
   
-  int id;
-
-  PImage background;
-  PGraphics pg;
-
-  World(int _id, String _background, HashMap<String, PImage[]> _glyphsMap){
-    id = _id;
+  World(HashMap<String, PImage[]> _glyphsMap) {
     glyphsMap = _glyphsMap;
-    background = loadImage(_background);
-    agents = new ArrayList<Agent>();
+
+    // Load/cache backgrounds.
+    background_private_world = loadImage("image/background/background_01.png");
+    background_public_world = loadImage("image/background/background_02.png");
 
     // Create the road networks.
     RoadNetwork carNetwork = new RoadNetwork("network/car.geojson", "car");
@@ -26,6 +28,7 @@ public class World {
     networks.put("bike", bikeNetwork);
     networks.put("ped", pedNetwork);
 
+    agents = new ArrayList<Agent>();
     createAgents();
 
     pg = createGraphics(DISPLAY_WIDTH, DISPLAY_HEIGHT, P2D);
@@ -37,6 +40,7 @@ public class World {
       a.initAgent();
     }  
   }
+
 
   public void createAgents() {
     // In the 'bad' world (1) there are additional agents created as 'zombie agents'.
@@ -157,25 +161,13 @@ public class World {
     }
   }
 
-  public void draw(PGraphics pg){
-    pg.background(0);
-    pg.image(background, 0, 0, pg.width, pg.height);
-
-
-    if (showNetwork) {
-      drawNetworks(pg);
-    }
-
-    for (Agent agent : agents) {
-      agent.draw(pg, showGlyphs);
-    }
-  }
 
   public void updateGraphics() {
     pg.beginDraw();
 
     pg.background(0);
-    if(showBackground){
+    if(showBackground) {
+      PImage background = getBackground();
       pg.image(background, 0, 0, pg.width, pg.height);
     }
 
@@ -192,9 +184,19 @@ public class World {
     pg.endDraw();
   }
 
+
   public void drawNetworks(PGraphics pg) {
     networks.get("car").draw(pg);
     networks.get("bike").draw(pg);
     networks.get("ped").draw(pg);
+  }
+
+
+  public PImage getBackground() {
+    if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
+      return background_private_world;
+    } else {
+      return background_public_world;
+    }
   }
 }

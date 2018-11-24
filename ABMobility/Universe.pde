@@ -1,11 +1,11 @@
 
 public class Universe {
-  // This is a universe with two alternatives for future worlds.
-  private World world1; // 'Bad' world with private cars
-  private World world2; // 'Good' world with shared transit
-  // Booleans manage threading of world updates.
-  private boolean updatingWorld1;
-  private boolean updatingWorld2;
+
+  private World world;
+
+  // Boolean manages threading of world updates.
+  private boolean updatingWorld;
+
   HashMap<String,Integer> colorMap;
   HashMap<String,Integer> colorMapGood;
   HashMap<String,Integer> colorMapBad;
@@ -54,53 +54,38 @@ public class Universe {
     glyphsMap.put("ped", pedGlyph);
 
     grid = new Grid();
-    world1 = new World(1, "image/background/background_01.png", glyphsMap);
-    world2 = new World(2, "image/background/background_02.png", glyphsMap);
-    updatingWorld1 = false;
-    updatingWorld2 = false;
+    world = new World(glyphsMap);
+    updatingWorld = false;
 
     shader = loadShader("mask.glsl");
     shader.set("width", float(DISPLAY_WIDTH));
     shader.set("height", float(DISPLAY_HEIGHT));
-    shader.set("left", world1.pg);
-    shader.set("right", world2.pg);
+    shader.set("sampler", world.pg);
     pg = createGraphics(DISPLAY_WIDTH, DISPLAY_HEIGHT, P2D);
    }
    
    void InitUniverse(){
-     world1.InitWorld();
-     world2.InitWorld();
+     world.InitWorld();
    }
 
    void update() {
     // Update the worlds and models + agents they contain
     // in separate threads than the main thread which draws
     // the graphics.
-    if (!updatingWorld1) {
-      updatingWorld1 = true;
-      Thread t1 = new Thread(new Runnable() {
+    if (!updatingWorld) {
+      updatingWorld = true;
+      Thread t = new Thread(new Runnable() {
         public void run(){
-          world1.update();
-          updatingWorld1 = false;
+          world.update();
+          updatingWorld = false;
         }
       });
-      t1.start();
-    }
-    if (!updatingWorld2) {
-      updatingWorld2 = true;
-      Thread t2 = new Thread(new Runnable() {
-        public void run(){
-          world2.update();
-          updatingWorld2 = false;
-        }
-      });
-      t2.start();
+      t.start();
     }
    }
 
   void updateGraphics() {
-    world1.updateGraphics();
-    world2.updateGraphics();
+    world.updateGraphics();
 
     pg.beginDraw();
     pg.shader(shader);
