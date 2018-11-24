@@ -23,7 +23,7 @@ public final int NUM_AGENTS_PER_WORLD = 1000;
 public final int PRIVATE_AVS_WORLD_ID = 1;
 public final int PUBLIC_AVS_WORLD_ID = 2;
 // The simulation can toggle between these 2 worlds.
-public int WORLD = PRIVATE_AVS_WORLD_ID; // Initialize universe with world of private AVs.
+public int WORLD_ID = PRIVATE_AVS_WORLD_ID; // Initialize universe with world of private AVs.
 
 
 Drawer drawer;
@@ -80,10 +80,10 @@ void keyPressed() {
 }
 
 void toggleWorld() {
-  if (WORLD == PUBLIC_AVS_WORLD_ID) {
-    WORLD = PRIVATE_AVS_WORLD_ID;
+  if (WORLD_ID == PUBLIC_AVS_WORLD_ID) {
+    WORLD_ID = PRIVATE_AVS_WORLD_ID;
   } else {
-    WORLD = PUBLIC_AVS_WORLD_ID;
+    WORLD_ID = PUBLIC_AVS_WORLD_ID;
   }
 }
 
