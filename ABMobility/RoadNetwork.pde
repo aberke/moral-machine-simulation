@@ -5,23 +5,21 @@ public class RoadNetwork {
   private PVector[] bounds;  // [0] Left-Top  [1] Right-Bottom
   private Pathfinder graph;
   private String type;
-  private int worldId;
 
-  RoadNetwork(String GeoJSONfile, String _type, int _worldId) {
+  RoadNetwork(String GeoJSONfile, String _type) {
 
     ArrayList<Node> nodes = new ArrayList<Node>();
     
-    // Load file -->
+    // Load file
     JSONObject JSON = loadJSONObject(GeoJSONfile);
     JSONArray JSONlines = JSON.getJSONArray("features");
     
-     // Set map bounds -->
+     // Set map bounds
     setBoundingBox(JSONlines);
     
     type = _type;
-    worldId = _worldId;
     
-    // Import all nodes -->
+    // Import all nodes
     Node prevNode = null;
     for(int i=0; i<JSONlines.size(); i++) {
       
@@ -31,7 +29,7 @@ public class RoadNetwork {
       JSONArray points = JSONlines.getJSONObject(i).getJSONObject("geometry").getJSONArray("coordinates");
 
       for(int j = 0; j<points.size(); j++) {
-           // Point coordinates to XY screen position -->
+        // Point coordinates to XY screen position
         PVector pos = toXY(points.getJSONArray(j).getFloat(0), points.getJSONArray(j).getFloat(1));
         
         // Node already exists (same X and Y pos). Connect  -->
@@ -95,16 +93,15 @@ public class RoadNetwork {
   public void draw(PGraphics p){    
     for (int i=0; i < graph.nodes.size(); i++){
       Node tempN = (Node)graph.nodes.get(i);
-      for(int j = 0; j < tempN.links.size(); j++){
-        if(showGlyphs){
+      for(int j=0; j<tempN.links.size(); j++){
+        if (showGlyphs) {
           p.stroke(universe.colorMapBW.get(type));
-        }else{
-          if(worldId==1){
+        } else {
+          if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
             p.stroke(universe.colorMapBad.get(type));
-          }else{
+          } else {
             p.stroke(universe.colorMapGood.get(type));
           }
-          
         }
         p.line(tempN.x, tempN.y, ((Connector)tempN.links.get(j)).n.x, ((Connector)tempN.links.get(j)).n.y);
       }

@@ -18,9 +18,9 @@ public class World {
     agents = new ArrayList<Agent>();
 
     // Create the road networks.
-    RoadNetwork carNetwork = new RoadNetwork("network/current_network/car_"+id+".geojson", "car", id);
-    RoadNetwork bikeNetwork = new RoadNetwork("network/current_network/bike_"+id+".geojson", "bike", id);
-    RoadNetwork pedNetwork = new RoadNetwork("network/current_network/ped_"+id+".geojson", "ped", id);
+    RoadNetwork carNetwork = new RoadNetwork("network/car.geojson", "car");
+    RoadNetwork bikeNetwork = new RoadNetwork("network/bike.geojson", "bike");
+    RoadNetwork pedNetwork = new RoadNetwork("network/ped.geojson", "ped");
     networks = new HashMap<String, RoadNetwork>();
     networks.put("car", carNetwork);
     networks.put("bike", bikeNetwork);
