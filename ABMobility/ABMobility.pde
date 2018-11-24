@@ -28,7 +28,8 @@ boolean showZombie = false;
 
 
 void settings() {
-  fullScreen(P3D, SPAN);
+  size(DISPLAY_WIDTH, DISPLAY_HEIGHT, P3D);
+  // fullScreen(P3D, SPAN);
 }
 
 void setup() {
