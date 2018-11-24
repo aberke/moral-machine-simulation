@@ -17,9 +17,20 @@ public final String SIMULATED_POPULATION_DATA_FILEPATH = "data/simPop.csv";
 public final int NUM_AGENTS_PER_WORLD = 1000;
 
 
+// There are two worlds that are simulated.
+// One world is where autonomous vehicles are privately owned and operated.
+// The other world is where autonomous vehicles are publicly shared.
+public final int PRIVATE_AVS_WORLD_ID = 1;
+public final int PUBLIC_AVS_WORLD_ID = 2;
+// The simulation can toggle between these 2 worlds.
+public int WORLD = PRIVATE_AVS_WORLD_ID; // Initialize universe with world of private AVs.
+
+
 Drawer drawer;
 Universe universe;
-boolean showBuilding = true;
+
+// Debug variables that can be toggled with key presses:
+boolean buildingDebug = false;
 boolean showBackground = false;
 boolean showGlyphs = true;
 boolean showNetwork = false;
@@ -48,19 +59,31 @@ void draw() {
 void keyPressed() {
   switch(key) {
   case 'b':
-    showBuilding= !showBuilding;
+    buildingDebug =! buildingDebug;
   break;
   case ' ':
-   showBackground=!showBackground;
+   showBackground =! showBackground;
   break;
   case 'g':
-    showGlyphs = !showGlyphs;
+    showGlyphs =! showGlyphs;
     break;
   case 'n':
-    showNetwork = !showNetwork;
+    showNetwork =! showNetwork;
     break;
   case 'z':
-    showZombie=!showZombie;
+    showZombie =! showZombie;
+    break;
+  case 'w':
+    toggleWorld();
     break;
   }
 }
+
+void toggleWorld() {
+  if (WORLD == PUBLIC_AVS_WORLD_ID) {
+    WORLD = PRIVATE_AVS_WORLD_ID;
+  } else {
+    WORLD = PUBLIC_AVS_WORLD_ID;
+  }
+}
+

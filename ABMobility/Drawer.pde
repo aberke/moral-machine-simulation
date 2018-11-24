@@ -19,9 +19,7 @@ public class Drawer {
     offscreenSurface.rect(DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2, DISPLAY_WIDTH, DISPLAY_HEIGHT);
     universe.update();
     universe.draw(offscreenSurface);
-    if(showBuilding){
-       universe.grid.draw(offscreenSurface);
-    }
+    universe.grid.draw(offscreenSurface);
     offscreenSurface.endDraw();
     surface.beginDraw();
     surface.clear();

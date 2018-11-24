@@ -117,8 +117,8 @@ public class Agent {
     destBlockId = getBlockIdByType(destType);
 
     // Determine whether this agent 'isZombie': is going to or from 'zombie land'
-    boolean srcOnGrid = universe.grid.isBuildingInCurrentGrid(srcBlockId);
-    boolean destOnGrid = universe.grid.isBuildingInCurrentGrid(destBlockId);
+    boolean srcOnGrid = buildingBlockOnGrid(srcBlockId);
+    boolean destOnGrid = buildingBlockOnGrid(destBlockId);
     isZombie = !(srcOnGrid && destOnGrid);
 
     // Mobility choice partly determined by distance
@@ -138,7 +138,7 @@ public class Agent {
 
 
   public Node getNodeByBlockId(int blockId) {
-    if (universe.grid.isBuildingInCurrentGrid(blockId)) {
+    if (buildingBlockOnGrid(blockId)) {
       return map.getRandomNodeInsideROI(universe.grid.getBuildingCenterPosistionPerId(blockId),BUILDING_SIZE);
     } else {
       return map.getRandomNodeInZombieLand();

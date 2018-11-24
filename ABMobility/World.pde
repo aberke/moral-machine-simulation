@@ -42,17 +42,10 @@ public class World {
     // In the 'bad' world (1) there are additional agents created as 'zombie agents'.
     // They are assigned a residence or office permenantly in zombie land
     int numNormalAgents = NUM_AGENTS_PER_WORLD;
-    int numZombieAgents = 0;
-    if (id == 1) {
-      numZombieAgents = int((0.5)*NUM_AGENTS_PER_WORLD);  // Additional 50% -- This number should be tweaked.
-    }
-
     if (INIT_AGENTS_FROM_DATAFILE) {
-      createRandomAgents(numZombieAgents, true);
       createAgentsFromDatafile(numNormalAgents);
     } else {
-      createRandomAgents(numZombieAgents, true);
-      createRandomAgents(numNormalAgents, false);
+      createRandomAgents(numNormalAgents);
     }
   }
   
@@ -65,6 +58,10 @@ public class World {
       int residentialBlockId = row.getInt("residential_block");
       int officeBlockId = row.getInt("office_block");
       int amenityBlockId = row.getInt("amenity_block");
+
+      if (!validAgentBlocks(residentialBlockId, officeBlockId, amenityBlockId)) {
+        continue;
+      }
 
       String mobilityMotif = getMobilityMotif(row);
       int householdIncome = row.getInt("hh_income");
@@ -111,32 +108,22 @@ public class World {
   }
 
 
-  public void createRandomAgents(int num, boolean zombie) {
+  public void createRandomAgents(int num) {
     for (int i = 0; i < num; i++) {
-      createRandomAgent(zombie);
+      createRandomAgent();
     }
   }
 
-  public void createRandomAgent(boolean isZombie) {
+  public void createRandomAgent() {
     // Randomly assign agent blocks and attributes.
     int rBlockId;
     int oBlockId;
     int aBlockId;
     do {
-      rBlockId = int(random(PHYSICAL_BUILDINGS_COUNT));
-      oBlockId = int(random(PHYSICAL_BUILDINGS_COUNT));
-      aBlockId = int(random(PHYSICAL_BUILDINGS_COUNT));
-    } while (rBlockId == oBlockId || rBlockId == aBlockId || oBlockId == aBlockId);
-
-    // If this agent is a zombie,
-    // either R or O block must be a virtual block in zombie land.
-    if (isZombie) {
-      if (int(random(2)) < 1) {
-        rBlockId = VIRTUAL_ZOMBIE_BUILDING_ID;
-      } else {
-        oBlockId = VIRTUAL_ZOMBIE_BUILDING_ID;
-      }
-    }
+      rBlockId = getRandomBuildingBlockId();
+      oBlockId = getRandomBuildingBlockId();
+      aBlockId = getRandomBuildingBlockId();
+    } while (!validAgentBlocks(rBlockId, oBlockId, aBlockId));
 
     String mobilityMotif = "ROR";
     int householdIncome = int(random(12));  // [0, 11]
@@ -144,6 +131,23 @@ public class World {
     int age = int(random(100));
 
     agents.add(new Agent(networks, glyphsMap, id, rBlockId, oBlockId, aBlockId, mobilityMotif, householdIncome, occupationType, age)); 
+  }
+
+
+  public boolean validAgentBlocks(int rBlockId, int oBlockId, int aBlockId) {
+    // Returns whether the list of buildings is valid for an agent.
+    // Otherwise, the buildings should be rechosen.
+
+    // Buildings must be different.
+    if (rBlockId == oBlockId || rBlockId == aBlockId || oBlockId == aBlockId) {
+      return false;
+    }
+    // At least one building must be on the grid.
+    if (!(buildingBlockOnGrid(rBlockId) || buildingBlockOnGrid(oBlockId) || buildingBlockOnGrid(aBlockId))) {
+      return false;
+    }
+
+    return true;
   }
 
 
