@@ -71,7 +71,7 @@ public class World {
       int householdIncome = row.getInt("hh_income");
       int occupationType = row.getInt("occupation_type");
       int age = row.getInt("age");
-      Agent a = new Agent(networks, glyphsMap, id, residentialBlockId, officeBlockId, amenityBlockId, mobilityMotif, householdIncome, occupationType, age);
+      Agent a = new Agent(networks, glyphsMap, residentialBlockId, officeBlockId, amenityBlockId, mobilityMotif, householdIncome, occupationType, age);
       agents.add(a);
 
       counter++;
@@ -134,7 +134,7 @@ public class World {
     int occupationType = int(random(5)) + 1;  // [1, 5]
     int age = int(random(100));
 
-    agents.add(new Agent(networks, glyphsMap, id, rBlockId, oBlockId, aBlockId, mobilityMotif, householdIncome, occupationType, age)); 
+    agents.add(new Agent(networks, glyphsMap, rBlockId, oBlockId, aBlockId, mobilityMotif, householdIncome, occupationType, age)); 
   }
 
 

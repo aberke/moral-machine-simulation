@@ -50,13 +50,13 @@ public class Agent {
   private boolean isZombie;
 
 
-  Agent(HashMap<String, RoadNetwork> _networks, HashMap<String, PImage[]> _glyphsMap, int _worldId,
+  Agent(HashMap<String, RoadNetwork> _networks, HashMap<String, PImage[]> _glyphsMap,
         int _residentialBlockId, int _officeBlockId, int _amenityBlockId,
         String _mobilityMotif,
         int _householdIncome, int _occupationType, int _age){
     networks = _networks;
     glyphsMap = _glyphsMap;
-    worldId = _worldId;
+    worldId = WORLD_ID;
     residentialBlockId = _residentialBlockId;
     officeBlockId = _officeBlockId;
     amenityBlockId = _amenityBlockId;
