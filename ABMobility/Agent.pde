@@ -45,7 +45,7 @@ public class Agent {
   private ArrayList<Node> path;  // Note path goes from destNode -> srcNode
   private PVector dir;
   private float speed;
-  private boolean isZombie;
+  private boolean travelsOffGrid;
 
 
   Agent(HashMap<String, RoadNetwork> _networks, HashMap<String, PImage[]> _glyphsMap,
@@ -61,7 +61,7 @@ public class Agent {
     householdIncome = _householdIncome;
     occupationType = _occupationType;
     age = _age;
-    isZombie = false;
+    travelsOffGrid = false;
   }
   
   
@@ -99,13 +99,14 @@ public class Agent {
         mobilitySequence = new String[] {"R", "O"};
         break;
     }
+    destBlockId = -1;
     setupNextTrip();
   }
 
 
   public void setupNextTrip() {
-    // destination block is null before the first trip (right after agent is initialized).
-    if (destBlockId == null) {
+    // destination block is < 0 before the first trip (right after agent is initialized).
+    if (destBlockId < 0) {
       srcBlockId = getBlockIdByType(mobilitySequence[ms]);
     } else {
       // The destination block becomes the source block for the next trip.
@@ -116,13 +117,13 @@ public class Agent {
     String destType = mobilitySequence[ms];
     destBlockId = getBlockIdByType(destType);
 
-    // Determine whether this agent 'isZombie': is going to or from 'zombie land'
+    // Determine whether this agent 'travelsOffGrid'
     boolean srcOnGrid = buildingBlockOnGrid(srcBlockId);
     boolean destOnGrid = buildingBlockOnGrid(destBlockId);
-    isZombie = !(srcOnGrid && destOnGrid);
+    travelsOffGrid = !(srcOnGrid && destOnGrid);
 
     // Mobility choice partly determined by distance
-    // agent must travel, so it is determined after zombieland
+    // agent must travel, so it is determined after travelsOffGrid
     // status is determined.
     setupMobilityType();
 
@@ -141,7 +142,7 @@ public class Agent {
     if (buildingBlockOnGrid(blockId)) {
       return map.getRandomNodeInsideROI(universe.grid.getBuildingCenterPosistionPerId(blockId), BUILDING_SIZE);
     } else {
-      return map.getRandomNodeInZombieLand();
+      return map.getRandomNodeOffGrid();
     }
   }
 
@@ -177,7 +178,7 @@ public class Agent {
 
 
   public void draw(PGraphics p, boolean glyphs) {
-    if (pos == null || path == null) {  // in zombie land.
+    if (pos == null || path == null) {
       return;
     }
     if (glyphs && (glyph.length > 0)) {
@@ -200,7 +201,8 @@ public class Agent {
       p.ellipse(pos.x, pos.y, 10*SCALE, 10*SCALE);
     }
     
-    if(showZombie & isZombie){
+    if (debugOffGridTravel && travelsOffGrid) {
+      // Highlight agents traveling on/off grid
       p.fill(#CC0000);
       p.ellipse(pos.x, pos.y, 10*SCALE, 10*SCALE);
      }
@@ -218,20 +220,21 @@ public class Agent {
 
     // How likely agent is to choose one mode of mobility over another depends
     // on whether agent is in 'bad' vs 'good' world.
-    // It also depends on how far an agent must travel.  Agents from 'zombieland'
-    // are traveling further and more likely to take a car.
+    // It also depends on how far an agent must travel.  Agents from traveling to
+    // or from a location off the main grid are traveling further and more likely
+    // to take a car.
     String[] mobilityTypes = {"car", "bike", "ped"};
     float[] mobilityChoiceProbabilities;
     if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
       // Bad/private world dummy probabilities:
-      if (isZombie) {
+      if (travelsOffGrid) {
         mobilityChoiceProbabilities = new float[] {0.9, 0.1, 0};
       } else {
         mobilityChoiceProbabilities = new float[] {0.7, 0.2, 0.1};
       }
     } else {
       // Good/shared world dummy probabilities:
-      if (isZombie) {
+      if (travelsOffGrid) {
         mobilityChoiceProbabilities = new float[] {0.3, 0.4, 0.3};
       } else {
         mobilityChoiceProbabilities = new float[] {0.1, 0.5, 0.4};

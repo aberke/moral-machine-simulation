@@ -30,19 +30,19 @@ public class Grid {
   private ArrayList<Building> buildings;
   public HashMap<Integer, PVector> gridMap;  // Maps building ID/location --> vector on grid.
 
-  public PVector zombieLandLocation;
+  public PVector offGridLocation;
 
   Table table;
 
   Grid() {
-    zombieLandLocation = new PVector(-1, -1);
+    offGridLocation = new PVector(-1, -1);
 
     // initialize the gridMap
     gridMap = new HashMap<Integer,PVector>();
     gridMap.put(0,new PVector(1,1));gridMap.put(1,new PVector(3,1));gridMap.put(2,new PVector(6,1));gridMap.put(3,new PVector(8,1));gridMap.put(4,new PVector(11,1));gridMap.put(5,new PVector(13,1));
     gridMap.put(6,new PVector(1,4));gridMap.put(7,new PVector(3,4));gridMap.put(8,new PVector(6,4));gridMap.put(9,new PVector(8,4));gridMap.put(10,new PVector(11,4));gridMap.put(11,new PVector(13,4));
     gridMap.put(12,new PVector(1,7));gridMap.put(13,new PVector(3,7));gridMap.put(14,new PVector(6,7));gridMap.put(15,new PVector(8,7));gridMap.put(16,new PVector(11,7));gridMap.put(17,new PVector(13,7));
-    gridMap.put(18, zombieLandLocation);gridMap.put(19, zombieLandLocation);gridMap.put(20, zombieLandLocation);gridMap.put(21, zombieLandLocation);gridMap.put(22, zombieLandLocation);gridMap.put(23, zombieLandLocation);
+    gridMap.put(18, offGridLocation);gridMap.put(19, offGridLocation);gridMap.put(20, offGridLocation);gridMap.put(21, offGridLocation);gridMap.put(22, offGridLocation);gridMap.put(23, offGridLocation);
 
     // initialize buildings
     buildings = new ArrayList<Building>();
@@ -63,7 +63,7 @@ public class Grid {
   public void draw(PGraphics p) {
     // Draw buildings
     for (Building b: buildings) {
-      if (b.loc != zombieLandLocation) {
+      if (b.loc != offGridLocation) {
         b.draw(p);
       }
     }

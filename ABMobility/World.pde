@@ -43,13 +43,11 @@ public class World {
 
 
   public void createAgents() {
-    // In the 'bad' world (1) there are additional agents created as 'zombie agents'.
-    // They are assigned a residence or office permenantly in zombie land
-    int numNormalAgents = NUM_AGENTS_PER_WORLD;
+    int agents = NUM_AGENTS_PER_WORLD;
     if (INIT_AGENTS_FROM_DATAFILE) {
-      createAgentsFromDatafile(numNormalAgents);
+      createAgentsFromDatafile(agents);
     } else {
-      createRandomAgents(numNormalAgents);
+      createRandomAgents(agents);
     }
   }
   
