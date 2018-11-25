@@ -1,4 +1,8 @@
+// The road network is built from a geojson file.
+// The nodes are parsed and put into a Pathfinder graph.
+
 import ai.pathfinder.*;
+
 
 public class RoadNetwork {
   private PVector size;
@@ -6,55 +10,74 @@ public class RoadNetwork {
   private Pathfinder graph;
   private String type;
 
-  RoadNetwork(String GeoJSONfile, String _type) {
+  // There are nodes in 'zombie land'.
+  // They are out of bounds of the map.  Agents come in and out of the
+  // perimeter of the grid/world via zombie land nodes.
+  private ArrayList<Node> zombieLandNodes;
 
-    ArrayList<Node> nodes = new ArrayList<Node>();
-    
-    // Load file
-    JSONObject JSON = loadJSONObject(GeoJSONfile);
-    JSONArray JSONlines = JSON.getJSONArray("features");
-    
-     // Set map bounds
-    setBoundingBox(JSONlines);
-    
+  RoadNetwork(String geoJSONfile, String _type) {
     type = _type;
+
+    // Set map bounds
+    // [top-left corner, bottom-right corner]
+    this.bounds = new PVector[] {new PVector(0 ,0), new PVector(1, 1)};
+    this.size = new PVector(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+
+    loadGraph(geoJSONfile);
+    setupZombieLandNodes();
+  }
+
+
+  private void loadGraph(String geoJSONfile) {
+    // Builds graph of nodes and edges from a geojson file.
+
+    JSONObject json = loadJSONObject(geoJSONfile);
+    JSONArray edges = json.getJSONArray("features");
     
-    // Import all nodes
+    // Create the graph from JSON array.
+    // Items of the array are edges of a graph.
+    // Parse the edges to create nodes, and connect them along their edges.
+    ArrayList<Node> nodes = new ArrayList<Node>();
     Node prevNode = null;
-    for(int i=0; i<JSONlines.size(); i++) {
-      
-      JSONObject props = JSONlines.getJSONObject(i).getJSONObject("properties");
-      boolean oneWay = props.isNull("oneway") ? false : props.getBoolean("oneway");
-      
-      JSONArray points = JSONlines.getJSONObject(i).getJSONObject("geometry").getJSONArray("coordinates");
 
-      for(int j = 0; j<points.size(); j++) {
+    JSONObject edge;
+    JSONArray edgePoints;
+    JSONArray point;
+    for(int i=0; i<edges.size(); i++) {
+      edge = edges.getJSONObject(i);
+
+      JSONObject edgeProperties = edge.getJSONObject("properties");
+      boolean oneWay = edgeProperties.isNull("oneway") ? false : edgeProperties.getBoolean("oneway");
+
+      edgePoints = edge.getJSONObject("geometry").getJSONArray("coordinates");
+      for(int j = 0; j<edgePoints.size(); j++) {
+        point = edgePoints.getJSONArray(j);
+
         // Point coordinates to XY screen position
-        PVector pos = toXY(points.getJSONArray(j).getFloat(0), points.getJSONArray(j).getFloat(1));
+        PVector pos = toXY(point.getFloat(0), point.getFloat(1));
         
-        // Node already exists (same X and Y pos). Connect  -->
-        Node existingNode = nodeExists(pos.x, pos.y, nodes);
+        // Node already exists (same X and Y pos)
+        Node node = nodeExists(pos.x, pos.y, nodes);
 
-        if(existingNode != null){
-          if(j > 0){
-            prevNode.connect(existingNode);
-            if(!oneWay){
-              existingNode.connect(prevNode);
+        if (node != null) {
+          if (j > 0){
+            prevNode.connect(node);
+            if (!oneWay) {
+              node.connect(prevNode);
             }
           }
-          prevNode = existingNode;
         } else {
-          Node newNode = new Node(pos.x, pos.y);
-          if(j > 0){
-            if(!oneWay){
-              prevNode.connectBoth(newNode);
+          node = new Node(pos.x, pos.y);
+          if (j > 0) {
+            if (!oneWay) {
+              prevNode.connectBoth(node);
             } else {
-              prevNode.connect(newNode);
+              prevNode.connect(node);
             }
           }
-          nodes.add(newNode);
-          prevNode = newNode;
+          nodes.add(node);
         }
+        prevNode = node;
       }
       graph = new Pathfinder(nodes); 
     }
@@ -69,19 +92,6 @@ public class RoadNetwork {
     return null;
   }
 
-  public void setBoundingBox(JSONArray JSONlines) {
-  
-    float minLng = 0;
-    float minLat = 0;
-    float maxLng = 1;
-    float maxLat = 1;
-    
-    this.bounds = new PVector[] {new PVector(minLng, minLat), new PVector(maxLng, maxLat)};
-    
-    // Resize map keeping ratio -->
-    float mapRatio = 1.6 / 1.0;
-    this.size = new PVector(DISPLAY_WIDTH, DISPLAY_HEIGHT);
-  }
 
   private PVector toXY(float x, float y) {
     return new PVector(
@@ -89,11 +99,23 @@ public class RoadNetwork {
       map(y, this.bounds[0].y, this.bounds[1].y, size.y, 0)
     );
   }
-  
-  public void draw(PGraphics p){    
+
+  private void setupZombieLandNodes() {
+    zombieLandNodes = new ArrayList<Node>();
+    Node node; 
+    for (int i=0; i<graph.nodes.size(); i++){
+      node = (Node) graph.nodes.get(i);
+      if(node.x<0 || node.x>DISPLAY_WIDTH || node.y<0 || node.y>DISPLAY_HEIGHT){
+        zombieLandNodes.add(node);
+      }
+    }
+  }
+
+
+  public void draw(PGraphics p) {
     for (int i=0; i < graph.nodes.size(); i++){
-      Node tempN = (Node)graph.nodes.get(i);
-      for(int j=0; j<tempN.links.size(); j++){
+      Node node = (Node)graph.nodes.get(i);
+      for(int j=0; j<node.links.size(); j++){
         if (showGlyphs) {
           p.stroke(universe.colorMapBW.get(type));
         } else {
@@ -103,35 +125,28 @@ public class RoadNetwork {
             p.stroke(universe.colorMapGood.get(type));
           }
         }
-        p.line(tempN.x, tempN.y, ((Connector)tempN.links.get(j)).n.x, ((Connector)tempN.links.get(j)).n.y);
+        p.line(node.x, node.y, ((Connector)node.links.get(j)).n.x, ((Connector)node.links.get(j)).n.y);
       }
     }  
   }
-  
+
+
   public Node getRandomNodeInsideROI(PVector pos, int size){
-    ArrayList<Node> tmp = new ArrayList<Node>();
-    Node tmpNode; 
-    for (int i=0;i<graph.nodes.size();i++){
-      tmpNode = (Node) graph.nodes.get(i);
-        if(((tmpNode.x>pos.x-size/2) && (tmpNode.x)<pos.x+size/2) &&
-        ((tmpNode.y>pos.y-size/2) && (tmpNode.y)<pos.y+size/2))
+    ArrayList<Node> nodes = new ArrayList<Node>();
+    Node node; 
+    for (int i=0; i<graph.nodes.size(); i++) {
+      node = (Node) graph.nodes.get(i);
+        if(((node.x>pos.x-size/2) && (node.x)<pos.x+size/2) &&
+        ((node.y>pos.y-size/2) && (node.y)<pos.y+size/2))
         {
-          tmp.add(tmpNode);
+          nodes.add(node);
         }       
       } 
-    return tmp.get(int(random(tmp.size())));
+    return nodes.get(int(random(nodes.size())));
   }
   
   
   public Node getRandomNodeInZombieLand(){
-    ArrayList<Node> tmp = new ArrayList<Node>();
-    Node tmpNode; 
-    for (int i=0;i<graph.nodes.size();i++){
-      tmpNode = (Node) graph.nodes.get(i);
-      if(tmpNode.x<0 || tmpNode.x>DISPLAY_WIDTH || tmpNode.y<0 || tmpNode.y>DISPLAY_HEIGHT){
-        tmp.add(tmpNode);
-      }
-    }
-    return tmp.get(int(random(tmp.size())));
+    return zombieLandNodes.get(int(random(zombieLandNodes.size())));
   }  
 } 
