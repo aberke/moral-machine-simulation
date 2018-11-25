@@ -35,7 +35,7 @@ boolean showBackground = false;
 boolean showGlyphs = true;
 boolean showNetwork = false;
 boolean showAgent = true;
-boolean showZombie = false;
+boolean debugOffGridTravel = false;
 
 
 void settings() {
@@ -70,8 +70,9 @@ void keyPressed() {
   case 'n':
     showNetwork =! showNetwork;
     break;
+  // highlight agents traveling on/off grid
   case 'z':
-    showZombie =! showZombie;
+    debugOffGridTravel =! debugOffGridTravel;
     break;
   case 'w':
     toggleWorld();

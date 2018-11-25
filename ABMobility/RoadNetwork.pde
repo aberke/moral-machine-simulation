@@ -10,10 +10,9 @@ public class RoadNetwork {
   private Pathfinder graph;
   private String type;
 
-  // There are nodes in 'zombie land'.
-  // They are out of bounds of the map.  Agents come in and out of the
-  // perimeter of the grid/world via zombie land nodes.
-  private ArrayList<Node> zombieLandNodes;
+  // There are nodes out of bounds of the map.
+  // Agents come in and out of the perimeter of the grid/world via these nodes.
+  private ArrayList<Node> offGridNodes;
 
   RoadNetwork(String geoJSONfile, String _type) {
     type = _type;
@@ -24,7 +23,7 @@ public class RoadNetwork {
     this.size = new PVector(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
     loadGraph(geoJSONfile);
-    setupZombieLandNodes();
+    setupOffGridNodes();
   }
 
 
@@ -100,13 +99,13 @@ public class RoadNetwork {
     );
   }
 
-  private void setupZombieLandNodes() {
-    zombieLandNodes = new ArrayList<Node>();
+  private void setupOffGridNodes() {
+    offGridNodes = new ArrayList<Node>();
     Node node; 
     for (int i=0; i<graph.nodes.size(); i++){
       node = (Node) graph.nodes.get(i);
       if(node.x<0 || node.x>DISPLAY_WIDTH || node.y<0 || node.y>DISPLAY_HEIGHT){
-        zombieLandNodes.add(node);
+        offGridNodes.add(node);
       }
     }
   }
@@ -146,7 +145,7 @@ public class RoadNetwork {
   }
   
   
-  public Node getRandomNodeInZombieLand(){
-    return zombieLandNodes.get(int(random(zombieLandNodes.size())));
+  public Node getRandomNodeOffGrid(){
+    return offGridNodes.get(int(random(offGridNodes.size())));
   }  
 } 
