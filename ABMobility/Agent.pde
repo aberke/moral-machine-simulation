@@ -13,8 +13,6 @@ public class Agent {
   private HashMap<String, RoadNetwork> networks;
   private HashMap<String, PImage[]> glyphsMap;
   private RoadNetwork map;  // Curent network used for mobility type.
-  private int worldId;  // 1=Bad world; 2=Good world
-
 
   private int residentialBlockId;
   private int officeBlockId;
@@ -44,7 +42,7 @@ public class Agent {
   private PImage[] glyph;
   private PVector pos;
   private Node srcNode, destNode, toNode;  // toNode is like next node
-  private ArrayList<Node> path;
+  private ArrayList<Node> path;  // Note path goes from destNode -> srcNode
   private PVector dir;
   private float speed;
   private boolean isZombie;
@@ -56,7 +54,6 @@ public class Agent {
         int _householdIncome, int _occupationType, int _age){
     networks = _networks;
     glyphsMap = _glyphsMap;
-    worldId = WORLD_ID;
     residentialBlockId = _residentialBlockId;
     officeBlockId = _officeBlockId;
     amenityBlockId = _amenityBlockId;
@@ -70,6 +67,11 @@ public class Agent {
   
   public void initAgent() {
     // Set up mobility sequence.  The agent travels through this sequence.
+    // Currently sequences with repeat trip types (e.g. RAAR) are not meaningfully
+    // different (e.g. RAAR does not differ from RAR)
+    // because block for triptype is staticly chosen and dest and src nodes
+    // must differ.  
+    // TODO: Change this?
     ms = 0;
     switch(mobilityMotif) {
       case "ROR" :
@@ -97,15 +99,13 @@ public class Agent {
         mobilitySequence = new String[] {"R", "O"};
         break;
     }
-
-    destBlockId = -1;
     setupNextTrip();
   }
 
 
   public void setupNextTrip() {
-    // destination block < 0 before the first trip (right after agent is initialized).
-    if (destBlockId < 0) {
+    // destination block is null before the first trip (right after agent is initialized).
+    if (destBlockId == null) {
       srcBlockId = getBlockIdByType(mobilitySequence[ms]);
     } else {
       // The destination block becomes the source block for the next trip.
@@ -139,7 +139,7 @@ public class Agent {
 
   public Node getNodeByBlockId(int blockId) {
     if (buildingBlockOnGrid(blockId)) {
-      return map.getRandomNodeInsideROI(universe.grid.getBuildingCenterPosistionPerId(blockId),BUILDING_SIZE);
+      return map.getRandomNodeInsideROI(universe.grid.getBuildingCenterPosistionPerId(blockId), BUILDING_SIZE);
     } else {
       return map.getRandomNodeInZombieLand();
     }
@@ -148,20 +148,18 @@ public class Agent {
 
   private void calcRoute() {
     pos = new PVector(srcNode.x, srcNode.y);
-    path = null;
     dir = new PVector(0.0, 0.0);
 
-    if (srcNode == destNode) {
-      // Agent already in destination
+    path = map.graph.aStar(srcNode, destNode);
+    // path may be null of nodes are not connected (sad/bad graph, but making graphs is hard)
+    if (path == null || srcNode == destNode) {
+      // Agent already in destination -- likely had motif sequence with repeat trip type
+      // e.g. motif like "RAAR"
       toNode = destNode;
-      return;
+      return;  // next trip will be set up
     }
-    // Next node is available
-    ArrayList<Node> newPath = map.graph.aStar(srcNode, destNode);
-    if ( newPath != null ) {
-      path = newPath;
-      toNode = path.get(path.size() - 2); // what happens if there are only two nodes?
-    }
+
+    toNode = path.get(path.size() - 2);
   }
 
 
@@ -194,9 +192,9 @@ public class Agent {
       }
     } else {
       p.noStroke();
-      if(worldId==1){
-      p.fill(universe.colorMapBad.get(mobilityType));
-      }else{
+      if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
+        p.fill(universe.colorMapBad.get(mobilityType));
+      } else {
         p.fill(universe.colorMapGood.get(mobilityType));
       }
       p.ellipse(pos.x, pos.y, 10*SCALE, 10*SCALE);
@@ -224,15 +222,15 @@ public class Agent {
     // are traveling further and more likely to take a car.
     String[] mobilityTypes = {"car", "bike", "ped"};
     float[] mobilityChoiceProbabilities;
-    if (worldId == 1) {
-      // Bad world dummy probabilities:
+    if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
+      // Bad/private world dummy probabilities:
       if (isZombie) {
         mobilityChoiceProbabilities = new float[] {0.9, 0.1, 0};
       } else {
         mobilityChoiceProbabilities = new float[] {0.7, 0.2, 0.1};
       }
     } else {
-      // Good world dummy probabilities:
+      // Good/shared world dummy probabilities:
       if (isZombie) {
         mobilityChoiceProbabilities = new float[] {0.3, 0.4, 0.3};
       } else {
@@ -269,26 +267,12 @@ public class Agent {
       case "ped" :
         speed = 0.2 + random(-0.05,0.05);
       break;
-      default:
-      break;
     }     
   }
 
   
   public void update() {
-    // Check if the agent's destination block has been moved
-    PVector currDestBlockLocation = universe.grid.getBuildingLocationById(destBlockId);
-    if (currDestBlockLocation != destBlockLocation) {
-      // The destination block has been moved!  Update the route.
-      destBlockLocation = currDestBlockLocation;
-      destNode = getNodeByBlockId(destBlockId);
-      calcRoute();
-    }
-
-    if (path == null) { // in zombie land
-      return;
-    }
-
+    // Update the agent's position in their trip.
     PVector toNodePos = new PVector(toNode.x, toNode.y);
     PVector destNodePos = new PVector(destNode.x, destNode.y);
     dir = PVector.sub(toNodePos, pos);  // unnormalized direction to go
