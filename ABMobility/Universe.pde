@@ -19,24 +19,24 @@ public class Universe {
   Universe() {
     // Set up color maps
     colorMap = new HashMap<String,Integer>();
-    colorMap.put("car",color(255,255,255));
-    colorMap.put("bike",color(120,52,165));
-    colorMap.put("ped",color(255,227,26));
+    colorMap.put(CAR,color(255,255,255));
+    colorMap.put(BIKE,color(120,52,165));
+    colorMap.put(PED,color(255,227,26));
 
     colorMapGood = new HashMap<String,Integer>();
-    colorMapGood.put("car",color(255,255,255));
-    colorMapGood.put("bike",color(0,234,169));
-    colorMapGood.put("ped",color(141,198,255));
+    colorMapGood.put(CAR,color(255,255,255));
+    colorMapGood.put(BIKE,color(0,234,169));
+    colorMapGood.put(PED,color(141,198,255));
 
     colorMapBad = new HashMap<String,Integer>();
-    colorMapBad.put("car",color(255,255,255));
-    colorMapBad.put("bike",color(120,52,165));
-    colorMapBad.put("ped",color(255,85,118));
+    colorMapBad.put(CAR,color(255,255,255));
+    colorMapBad.put(BIKE,color(120,52,165));
+    colorMapBad.put(PED,color(255,85,118));
 
     colorMapBW = new HashMap<String,Integer>();
-    colorMapBW.put("car", #DDDDDD);
-    colorMapBW.put("bike",#888888);
-    colorMapBW.put("ped",#444444);
+    colorMapBW.put(CAR, #DDDDDD);
+    colorMapBW.put(BIKE, #888888);
+    colorMapBW.put(PED, #444444);
 
     // Create the glyphs and hold in map
     PImage[] carGlyph = new PImage[1];
@@ -49,9 +49,9 @@ public class Universe {
     pedGlyph[1] = loadImage("image/glyphs/human-1.gif");
     pedGlyph[2] = loadImage("image/glyphs/human-2.gif");
     glyphsMap = new HashMap<String, PImage[]>();
-    glyphsMap.put("car", carGlyph);
-    glyphsMap.put("bike", bikeGlyph);
-    glyphsMap.put("ped", pedGlyph);
+    glyphsMap.put(CAR, carGlyph);
+    glyphsMap.put(BIKE, bikeGlyph);
+    glyphsMap.put(PED, pedGlyph);
 
     grid = new Grid();
     world = new World(glyphsMap);
@@ -72,6 +72,9 @@ public class Universe {
     // Update the worlds and models + agents they contain
     // in separate threads than the main thread which draws
     // the graphics.
+    if (pause) {
+      return;
+    }
     if (!updatingWorld) {
       updatingWorld = true;
       Thread t = new Thread(new Runnable() {
