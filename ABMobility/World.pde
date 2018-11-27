@@ -16,8 +16,9 @@ public class World {
     glyphsMap = _glyphsMap;
 
     // Load/cache backgrounds.
-    background_private_world = loadImage("image/background/background_01.png");
-    background_public_world = loadImage("image/background/background_02.png");
+    background_private_world = loadImage("image/background/background-red.png");
+    background_public_world = loadImage("image/background/background-white.png");
+    // background_public_world = loadImage("image/background/background-green.png");
 
     // Create the road networks.
     RoadNetwork carNetwork = new RoadNetwork("network/car.geojson", CAR);
