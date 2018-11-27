@@ -6,7 +6,7 @@ public final String OFFICE = "O";
 public final String AMENITY = "A";
 
 // Agents wait before their next trip begins so that they do not all flow out at once
-public final int TRIP_START_TIMER_MAX = 100;  // Wait up to this many passes
+public final int TRIP_START_COUNTDOWN_MAX = 500;  // Wait up to this many passes
 
 public final int YIELD_RIGHT_MAX = 50;
 public final int YIELD_MAX = 10;
@@ -72,6 +72,9 @@ public class Agent {
   private int bufferDebugColor;
   private int innerBufferAreaSize, outterBufferAreaSize;
 
+  // There are small waits before new trips begin
+  // These waits are randomly chosen to stagger when agents enter grid.
+  private boolean isOnTrip;
   private int tripBeginsCountdown;
 
 
@@ -169,7 +172,8 @@ public class Agent {
     yield = 0;
     yieldingTo = null;
 
-    tripBeginsCountdown = int(random(TRIP_START_TIMER_MAX));
+    isOnTrip = false;
+    tripBeginsCountdown = int(random(TRIP_START_COUNTDOWN_MAX));
   }
 
 
@@ -306,7 +310,7 @@ public class Agent {
 
 
   public void draw(PGraphics p, boolean glyphs) {
-    if (pos == null || path == null || dir == null) {
+    if (!isOnTrip || pos == null || path == null) {
       return;
     }
 
@@ -348,8 +352,7 @@ public class Agent {
 
   
   public void update() {
-    if (tripBeginsCountdown > 0) {
-      tripBeginsCountdown -= 1;  // WAIT it is not time for the trip to start yet
+    if (!isOnTrip && !beginTrip()) {
       return;
     }
 
@@ -420,6 +423,15 @@ public class Agent {
     }
   }
 
+  public boolean beginTrip() {
+    if (tripBeginsCountdown == 0) {
+      isOnTrip = true;
+      return true;
+    }
+    tripBeginsCountdown -= 1;
+    return false;
+  }
+
 
   private void yield() {
     return;
@@ -443,7 +455,7 @@ public class Agent {
     if (pathIndex < 0) {
       // Arrived to destination (because nextNode == destNode)
       updatePosition(null);
-      dir = null;
+      isOnTrip = false;
       this.setupNextTrip();
     } else {
       // Not destination. Look for next node.
