@@ -3,7 +3,7 @@ public class World {
   PGraphics pg;
 
   // Networks is a mapping from network name to RoadNetwork.
-  // e.g. "car" --> RoadNetwork, ... etc
+  // e.g. CAR --> RoadNetwork, ... etc
   private HashMap<String, RoadNetwork> networks;
   private HashMap<String, PImage[]> glyphsMap;
   private ArrayList<Agent> agents;
@@ -20,13 +20,13 @@ public class World {
     background_public_world = loadImage("image/background/background_02.png");
 
     // Create the road networks.
-    RoadNetwork carNetwork = new RoadNetwork("network/car.geojson", "car");
-    RoadNetwork bikeNetwork = new RoadNetwork("network/bike.geojson", "bike");
-    RoadNetwork pedNetwork = new RoadNetwork("network/ped.geojson", "ped");
+    RoadNetwork carNetwork = new RoadNetwork("network/car.geojson", CAR);
+    RoadNetwork bikeNetwork = new RoadNetwork("network/bike.geojson", BIKE);
+    RoadNetwork pedNetwork = new RoadNetwork("network/ped.geojson", PED);
     networks = new HashMap<String, RoadNetwork>();
-    networks.put("car", carNetwork);
-    networks.put("bike", bikeNetwork);
-    networks.put("ped", pedNetwork);
+    networks.put(CAR, carNetwork);
+    networks.put(BIKE, bikeNetwork);
+    networks.put(PED, pedNetwork);
 
     agents = new ArrayList<Agent>();
     createAgents();
@@ -168,25 +168,21 @@ public class World {
       PImage background = getBackground();
       pg.image(background, 0, 0, pg.width, pg.height);
     }
-
     if (showNetwork) {
       drawNetworks(pg);
     }
 
     for (Agent agent : agents) {
-      if(showAgent){
-        agent.draw(pg, showGlyphs);
-      }
-      
+      agent.draw(pg, showGlyphs);
     }
     pg.endDraw();
   }
 
 
   public void drawNetworks(PGraphics pg) {
-    networks.get("car").draw(pg);
-    networks.get("bike").draw(pg);
-    networks.get("ped").draw(pg);
+    networks.get(CAR).draw(pg);
+    networks.get(BIKE).draw(pg);
+    networks.get(PED).draw(pg);
   }
 
 
