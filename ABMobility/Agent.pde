@@ -8,6 +8,14 @@ public final String AMENITY = "A";
 // Agents wait before their next trip begins so that they do not all flow out at once (there would be too much traffic!)
 public final int TRIP_START_COUNTDOWN_MAX = 10*NUM_AGENTS_PER_WORLD;  // Wait up to this many passes
 
+// When agents use shared transit as their travel mode, they join another vehicle (a shared AV).
+// Implementation: A new agent is not placed on the grid.
+// Instead, given time passes befor their trip to take place, and then they begin their next trip.
+// They choose a new mobility mode of transit for each new trip.
+// The visual result is fewer agents on the grid (because they are sharing the vehicles).
+// Shared transit trip time was determined based on the average trip time for other agent mobility modes.
+public final int SHARED_TRANSIT_TRIP_TIME = 2000;
+
 public final int YIELD_MAX = 100;
 
 public static int DEFAULT_BUFFER_DEBUG_COLOR = #888888;
@@ -23,6 +31,8 @@ public class Agent {
   private HashMap<String, PImage[]> glyphsMap;
   private RoadNetwork map;  // Curent network used for mobility type.
 
+  // Agents are from a simulated population based on real census survey data.
+  // They have attributes from this data that determine their travel choices.
   private int residentialBlockId;
   private int officeBlockId;
   private int amenityBlockId;
@@ -57,14 +67,14 @@ public class Agent {
   private float speed, highSpeed, lowSpeed;
   private boolean travelsOffGrid;
 
-  private int yield;
-  private Agent yieldingTo;
-
   // This is for yielding decisions & coordinating who goes or yields when
   // It is public so that other agents can check if they are being yielded to by this agent (i.e. talk)
   // Maps other agents in buffer area to amount of time have been yielding to them
   // (Agent) who yielding to --> Int (time spent yielding to them)
   public HashMap<Agent, Integer> yieldToMap;
+
+  public boolean onSharedTransitTrip;
+  public int sharedTransitTripTime;
 
   private int bufferDebugColor;
   private int innerBufferAreaSize, outterBufferAreaSize;
@@ -136,6 +146,9 @@ public class Agent {
 
 
   public void setupNextTrip() {
+    isOnTrip = false;
+    tripBeginsCountdown = int(random(TRIP_START_COUNTDOWN_MAX));
+
     // Set up src and dest blocks
     // destination block is < 0 before the first trip (right after agent is initialized).
     if (destBlockId < 0) {
@@ -154,25 +167,24 @@ public class Agent {
     boolean destOnGrid = buildingBlockOnGrid(destBlockId);
     travelsOffGrid = !(srcOnGrid && destOnGrid);
 
+    destBlockLocation = universe.grid.getBuildingLocationById(destBlockId);
+
     // Mobility choice partly determined by distance
     // agent must travel, so it is determined after travelsOffGrid
     // status is determined.
     setupMobilityType();
+    if (mobilityType == SHARED_TRANSIT) {
+      onSharedTransitTrip = true;
+      sharedTransitTripTime = 0;
+    } else {
+      onSharedTransitTrip = false;
 
-    destBlockLocation = universe.grid.getBuildingLocationById(destBlockId);
-    
-    // Get the nodes on the graph
-    // Note the graph is specific to mobility type and was chosen when mobility type was set up.
-    srcNode = getNodeByBlockId(srcBlockId);
-    destNode = getNodeByBlockId(destBlockId);
-
-    calcRoute();
-
-    yield = 0;
-    yieldingTo = null;
-
-    isOnTrip = false;
-    tripBeginsCountdown = int(random(TRIP_START_COUNTDOWN_MAX));
+      // Get the nodes on the map
+      // Note the graph is specific to mobility type and was chosen when mobility type was set up.
+      srcNode = getNodeByBlockId(srcBlockId);
+      destNode = getNodeByBlockId(destBlockId);
+      calcRoute();
+    }
   }
 
 
@@ -200,6 +212,9 @@ public class Agent {
 
   private void setupMobilityType() {
     mobilityType = chooseMobilityType();
+    if (mobilityType == SHARED_TRANSIT) {
+      return;
+    }
     map = networks.get(mobilityType);
     glyph = glyphsMap.get(mobilityType);
     setupSpeed();
@@ -222,40 +237,35 @@ public class Agent {
     // It also depends on how far an agent must travel.  Agents from traveling to
     // or from a location off the main grid are traveling further and more likely
     // to take a car.
-
-    // TODO: for debugging purposes, only using CAR for now
-    // TODO: change back
-    return CAR;
-
-    // String[] mobilityTypes = {CAR, BIKE, PED};
-    // float[] mobilityChoiceProbabilities;
-    // if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
-    //   // Bad/private world dummy probabilities:
-    //   if (travelsOffGrid) {
-    //     mobilityChoiceProbabilities = new float[] {0.9, 0.1, 0};
-    //   } else {
-    //     mobilityChoiceProbabilities = new float[] {0.7, 0.2, 0.1};
-    //   }
-    // } else {
-    //   // Good/shared world dummy probabilities:
-    //   if (travelsOffGrid) {
-    //     mobilityChoiceProbabilities = new float[] {0.3, 0.4, 0.3};
-    //   } else {
-    //     mobilityChoiceProbabilities = new float[] {0.1, 0.5, 0.4};
-    //   }
-    // }
-    // // Transform the probability distribution into an array to randomly sample from.
-    // String[] mobilityChoiceDistribution = new String[100];
-    // int m = 0;
-    // for (int i=0; i<mobilityTypes.length; i++) {
-    //   for (int p=0; p<int(mobilityChoiceProbabilities[i]*100); p++) {
-    //     mobilityChoiceDistribution[m] = mobilityTypes[i];
-    //     m++;
-    //   }
-    // }
-    // // Take random sample from distribution.
-    // int choice = int(random(100));
-    // return mobilityChoiceDistribution[choice];
+    String[] mobilityTypes = {CAR, BIKE, PED, SHARED_TRANSIT};
+    float[] mobilityChoiceProbabilities;
+    if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
+      // Bad/private world dummy probabilities:
+      if (travelsOffGrid) {
+        mobilityChoiceProbabilities = new float[] {1, 0, 0, 0};
+      } else {
+        mobilityChoiceProbabilities = new float[] {0.75, 0.15, 0.1, 0};
+      }
+    } else {
+      // Good/shared world dummy probabilities:
+      if (travelsOffGrid) {
+        mobilityChoiceProbabilities = new float[] {0.2, 0.3, 0.2, 0.3};
+      } else {
+        mobilityChoiceProbabilities = new float[] {0.1, 0.4, 0.3, 0.2};
+      }
+    }
+    // Transform the probability distribution into an array to randomly sample from.
+    String[] mobilityChoiceDistribution = new String[100];
+    int m = 0;
+    for (int i=0; i<mobilityTypes.length; i++) {
+      for (int p=0; p<int(mobilityChoiceProbabilities[i]*100); p++) {
+        mobilityChoiceDistribution[m] = mobilityTypes[i];
+        m++;
+      }
+    }
+    // Take random sample from distribution.
+    int choice = int(random(100));
+    return mobilityChoiceDistribution[choice];
   }
 
 
@@ -264,15 +274,15 @@ public class Agent {
       case CAR :
         highSpeed = 0.65 + random(0.2);
         lowSpeed = highSpeed - 0.3;
-      break;
+        break;
       case BIKE :
         highSpeed = 0.3 + random(0.15);
         lowSpeed = highSpeed - 0.05;
-      break;
+        break;
       case PED :
         highSpeed = 0.2 + random(0.05);
         lowSpeed = highSpeed - 0.05;
-      break;
+        break;
     }
     speed = highSpeed;
   }
@@ -361,6 +371,11 @@ public class Agent {
   
   public void update() {
     if (!isOnTrip && !beginTrip()) {
+      return;
+    }
+
+    if (updateAsSharedTransit()) {
+      // Agent is on shared transit.  It has been handled.
       return;
     }
 
@@ -457,7 +472,6 @@ public class Agent {
     if (pathIndex < 0) {
       // Arrived to destination (because nextNode == destNode)
       updatePosition(null);
-      isOnTrip = false;
       this.setupNextTrip();
     } else {
       // Not destination. Look for next node.
@@ -495,4 +509,26 @@ public class Agent {
       speed = highSpeed;
     }
   }
+
+  public boolean updateAsSharedTransit() {
+    if (!onSharedTransitTrip) {
+      return false;
+    }
+    sharedTransitTripTime += 1;
+    if (sharedTransitTripTime > SHARED_TRANSIT_TRIP_TIME) {
+      // The agent has arrived to their destination
+      setupNextTrip();
+    }
+    return true;
+  }
 }
+
+
+
+
+
+
+
+
+
+

@@ -1,7 +1,7 @@
 /* Main file for agent based model simulation.
 */
 
-float SCALE = 0.6;
+float SCALE = 0.8; //0.6;
 public final int SIMULATION_WIDTH = 2128;
 public final int SIMULATION_HEIGHT = 1330;
 
@@ -15,7 +15,7 @@ public final String BLOCKS_DATA_FILEPATH = "data/blocks.csv";
 
 public boolean INIT_AGENTS_FROM_DATAFILE = true;
 public final String SIMULATED_POPULATION_DATA_FILEPATH = "data/simPop.csv";
-public final int NUM_AGENTS_PER_WORLD = 750; //00;
+public final int NUM_AGENTS_PER_WORLD = 800;
 
 
 // There are two worlds that are simulated.
@@ -30,6 +30,7 @@ public int WORLD_ID = PRIVATE_AVS_WORLD_ID; // Initialize universe with world of
 public final String CAR = "CAR";
 public final String BIKE = "BIKE";
 public final String PED = "PED";  // (Pedestrian)
+public final String SHARED_TRANSIT = "SHARED_TRANSIT";
 
 
 Drawer drawer;
