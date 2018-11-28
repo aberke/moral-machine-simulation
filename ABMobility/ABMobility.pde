@@ -51,10 +51,11 @@ void settings() {
 }
 
 void setup() {
+  surface.setResizable(true);
+  frameRate(30);
   drawer = new Drawer(this);
   universe = new Universe();
   universe.InitUniverse();
-  frameRate(30);
 } 
 
 void draw() {
