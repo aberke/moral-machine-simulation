@@ -5,19 +5,10 @@ public final String RESIDENTIAL = "R";
 public final String OFFICE = "O";
 public final String AMENITY = "A";
 
-// Agents wait before their next trip begins so that they do not all flow out at once
-public final int TRIP_START_COUNTDOWN_MAX = 500;  // Wait up to this many passes
+// Agents wait before their next trip begins so that they do not all flow out at once (there would be too much traffic!)
+public final int TRIP_START_COUNTDOWN_MAX = 10*NUM_AGENTS_PER_WORLD;  // Wait up to this many passes
 
-public final int YIELD_RIGHT_MAX = 50;
-public final int YIELD_MAX = 10;
-
-
-public static int CAR_OUTTER_BUFFER_AREA_SIZE = 8;
-public static int CAR_INNER_BUFFER_AREA_SIZE = 5;
-public static int BIKE_OUTTER_BUFFER_AREA_SIZE = 6;
-public static int BIKE_INNER_BUFFER_AREA_SIZE = 3;
-public static int PED_OUTTER_BUFFER_AREA_SIZE = 6;
-public static int PED_INNER_BUFFER_AREA_SIZE = 3;
+public final int YIELD_MAX = 100;
 
 public static int DEFAULT_BUFFER_DEBUG_COLOR = #888888;
 public static int COLLISION_BUFFER_DEBUG_COLOR = #FF0000; // RED
@@ -69,8 +60,15 @@ public class Agent {
   private int yield;
   private Agent yieldingTo;
 
+  // This is for yielding decisions & coordinating who goes or yields when
+  // It is public so that other agents can check if they are being yielded to by this agent (i.e. talk)
+  // Maps other agents in buffer area to amount of time have been yielding to them
+  // (Agent) who yielding to --> Int (time spent yielding to them)
+  public HashMap<Agent, Integer> yieldToMap;
+
   private int bufferDebugColor;
   private int innerBufferAreaSize, outterBufferAreaSize;
+  private PVector bufferOffset;
 
   // There are small waits before new trips begin
   // These waits are randomly chosen to stagger when agents enter grid.
@@ -98,6 +96,7 @@ public class Agent {
   
   
   public void initAgent() {
+    yieldToMap = new HashMap<Agent, Integer>();
     // Set up mobility sequence.  The agent travels through this sequence.
     // Currently sequences with repeat trip types (e.g. RAAR) are not meaningfully
     // different (e.g. RAAR does not differ from RAR)
@@ -223,50 +222,55 @@ public class Agent {
     // It also depends on how far an agent must travel.  Agents from traveling to
     // or from a location off the main grid are traveling further and more likely
     // to take a car.
-    String[] mobilityTypes = {CAR, BIKE, PED};
-    float[] mobilityChoiceProbabilities;
-    if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
-      // Bad/private world dummy probabilities:
-      if (travelsOffGrid) {
-        mobilityChoiceProbabilities = new float[] {0.9, 0.1, 0};
-      } else {
-        mobilityChoiceProbabilities = new float[] {0.7, 0.2, 0.1};
-      }
-    } else {
-      // Good/shared world dummy probabilities:
-      if (travelsOffGrid) {
-        mobilityChoiceProbabilities = new float[] {0.3, 0.4, 0.3};
-      } else {
-        mobilityChoiceProbabilities = new float[] {0.1, 0.5, 0.4};
-      }
-    }
-    // Transform the probability distribution into an array to randomly sample from.
-    String[] mobilityChoiceDistribution = new String[100];
-    int m = 0;
-    for (int i=0; i<mobilityTypes.length; i++) {
-      for (int p=0; p<int(mobilityChoiceProbabilities[i]*100); p++) {
-        mobilityChoiceDistribution[m] = mobilityTypes[i];
-        m++;
-      }
-    }
-    // Take random sample from distribution.
-    int choice = int(random(100));
-    return mobilityChoiceDistribution[choice];
+
+    // TODO: for debugging purposes, only using CAR for now
+    // TODO: change back
+    return CAR;
+
+    // String[] mobilityTypes = {CAR, BIKE, PED};
+    // float[] mobilityChoiceProbabilities;
+    // if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
+    //   // Bad/private world dummy probabilities:
+    //   if (travelsOffGrid) {
+    //     mobilityChoiceProbabilities = new float[] {0.9, 0.1, 0};
+    //   } else {
+    //     mobilityChoiceProbabilities = new float[] {0.7, 0.2, 0.1};
+    //   }
+    // } else {
+    //   // Good/shared world dummy probabilities:
+    //   if (travelsOffGrid) {
+    //     mobilityChoiceProbabilities = new float[] {0.3, 0.4, 0.3};
+    //   } else {
+    //     mobilityChoiceProbabilities = new float[] {0.1, 0.5, 0.4};
+    //   }
+    // }
+    // // Transform the probability distribution into an array to randomly sample from.
+    // String[] mobilityChoiceDistribution = new String[100];
+    // int m = 0;
+    // for (int i=0; i<mobilityTypes.length; i++) {
+    //   for (int p=0; p<int(mobilityChoiceProbabilities[i]*100); p++) {
+    //     mobilityChoiceDistribution[m] = mobilityTypes[i];
+    //     m++;
+    //   }
+    // }
+    // // Take random sample from distribution.
+    // int choice = int(random(100));
+    // return mobilityChoiceDistribution[choice];
   }
 
 
   private void setupSpeed() {
     switch(mobilityType) {
       case CAR :
-        highSpeed = 0.7 + random(-0.3, 0.3);
-        lowSpeed = highSpeed - 0.2;
+        highSpeed = 0.65 + random(0.2);
+        lowSpeed = highSpeed - 0.3;
       break;
       case BIKE :
-        highSpeed = 0.3 + random(-0.15, 0.15);
+        highSpeed = 0.3 + random(0.15);
         lowSpeed = highSpeed - 0.05;
       break;
       case PED :
-        highSpeed = 0.2 + random(-0.05, 0.05);
+        highSpeed = 0.2 + random(0.05);
         lowSpeed = highSpeed - 0.05;
       break;
     }
@@ -275,20 +279,24 @@ public class Agent {
 
 
   private void setupBufferArea() {
-    switch(mobilityType) {
-      case CAR :
-        outterBufferAreaSize = CAR_OUTTER_BUFFER_AREA_SIZE;
-        innerBufferAreaSize = CAR_INNER_BUFFER_AREA_SIZE;
-      break;
-      case BIKE :
-        outterBufferAreaSize = BIKE_OUTTER_BUFFER_AREA_SIZE;
-        innerBufferAreaSize = BIKE_INNER_BUFFER_AREA_SIZE;
-      break;
-      case PED :
-        outterBufferAreaSize = PED_OUTTER_BUFFER_AREA_SIZE;
-        innerBufferAreaSize = PED_INNER_BUFFER_AREA_SIZE;
-      break;
-    }
+    PImage img = glyph[0];
+    // TODO
+    // switch(mobilityType) {
+    //   case CAR :
+        // the buffer goes around it
+        innerBufferAreaSize = (int)(((img.width + 2)*SCALE)/2);
+        outterBufferAreaSize = 2*innerBufferAreaSize;
+        bufferOffset = new PVector(0, (int)((img.width*SCALE)/2));
+      // break;
+      // case BIKE :
+      //   outterBufferAreaSize = BIKE_OUTTER_BUFFER_AREA_SIZE;
+      //   innerBufferAreaSize = BIKE_INNER_BUFFER_AREA_SIZE;
+      // break;
+      // case PED :
+      //   outterBufferAreaSize = PED_OUTTER_BUFFER_AREA_SIZE;
+      //   innerBufferAreaSize = PED_INNER_BUFFER_AREA_SIZE;
+      // break;
+    // }
   }
 
 
@@ -316,10 +324,10 @@ public class Agent {
 
     if (debugGridBufferArea) {
       // Outter buffer area is where agent goes more slowly
-      ArrayList<int[]> gridOutterBufferAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, outterBufferAreaSize);
+      ArrayList<int[]> gridOutterBufferAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, outterBufferAreaSize, bufferOffset);
       universe.grid.drawGridBufferArea(p, gridOutterBufferAreaCells, bufferDebugColor);
       // Inner buffer area is where agent yields
-      ArrayList<int[]> gridInnerBufferAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, innerBufferAreaSize);
+      ArrayList<int[]> gridInnerBufferAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, innerBufferAreaSize, bufferOffset);
       universe.grid.drawGridBufferArea(p, gridInnerBufferAreaCells, bufferDebugColor);
     }
 
@@ -361,67 +369,61 @@ public class Agent {
     PVector destNodePos = new PVector(destNode.x, destNode.y);
     dir = PVector.sub(nextNodePos, pos);  // unnormalized direction to go
 
-    // Get speed to move by based on congestion
-    updateSpeed();
-
     if (dir.mag() <= dir.normalize().mult(speed).mag()) {
       // Agent has arrived to its nextNode
       updateNextNode();
     } else {
       // Not arrived to nextNode.
 
-      // move to nextPosition or YIELD
+      yieldOrMove();
+    }
+  }
 
-      // Check if desired next position is occupied
-      // Get next position by adding direction to position.
+  public void yieldOrMove() {
+    // move to nextPosition or YIELD
 
-      PVector nextPosition = PVector.add(pos, dir);
-      int nextPositionX = (int)nextPosition.x;
-      int nextPositionY = (int)nextPosition.y;
+    // Check if desired next position is occupied
+    // Get next position by adding direction to position.
 
-      Agent yieldTo = universe.grid.getGridCellOtherOccupant(nextPositionX, nextPositionY, this);
-      if (!(yieldTo == null)) {
-        if (yieldTo == yieldingTo) {
-          // Already yielding to this agent
-          yield += 1;
-        } else {
-          yieldingTo = yieldTo;
-          yield = 1;
-        }
 
-        if ((yield >= YIELD_MAX) && (mobilityType != CAR)) {
-          // Bikers and pedestrians can go around others after waiting
-          goAround(nextPosition);
-          return;
-        }
-        bufferDebugColor = COLLISION_BUFFER_DEBUG_COLOR;
-        yield();
-        return;
+    PVector nextPosition = PVector.add(pos, dir);
+    int nextPositionX = (int)nextPosition.x;
+    int nextPositionY = (int)nextPosition.y;
+
+    // Determine if must yield
+    boolean mustYield = false;
+    // Get all the other agents in the buffer area in order to check if need to yield
+    // Update timer for how long have been yielding to them
+    // At the end, yieldToMap contains only the agents that are in the buffer area and are
+    // not already yielding to this agent
+    HashMap<Agent, Integer> prevYieldToMap = yieldToMap;
+    yieldToMap = new HashMap<Agent, Integer>();
+
+    ArrayList<int[]> yieldToAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, innerBufferAreaSize, bufferOffset);
+    ArrayList<Agent> yieldTos = universe.grid.getGridCellsOtherOccupants(yieldToAreaCells, this);
+    for (Agent yieldTo: yieldTos) {
+      if (yieldTo.yieldToMap.get(this) != null) {
+        continue;  // This other agent is already yielding to you --> do not yield to them too!
       }
-      // TODO: special yielding logic for right buffer
-      ArrayList<int[]> gridInnerBufferAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, innerBufferAreaSize);
-      yieldTo = universe.grid.getGridCellsOtherOccupant(gridInnerBufferAreaCells, this);
-      if (!(yieldTo == null)) {
-        if (yieldTo == yieldingTo) {
-          // Already yielding to this agent
-          yield += 1;
-        } else {
-          yieldingTo = yieldTo;
-          yield = 1;
-        }
-
-        if (yield < YIELD_MAX) {
-          // YIELD
-          bufferDebugColor = BUFFER_OCCUPIED_BUFFER_DEBUG_COLOR;
-          yield();
-          return;
-        }
+      int yieldToWaitTime = 1;
+      if (prevYieldToMap.get(yieldTo) != null) {
+        yieldToWaitTime += prevYieldToMap.get(yieldTo);
       }
-      // Made it this far with no one to yield to!
-      bufferDebugColor = DEFAULT_BUFFER_DEBUG_COLOR;
+      yieldToMap.put(yieldTo, yieldToWaitTime);
+      if (!mustYield && (yieldToWaitTime < YIELD_MAX)) {
+        mustYield = true;
+      }
+    }
+    if (mustYield) {
+      yield();
+      return;
+    } else {
+      // update speed to move by based on congestion
+      updateSpeed();
       go(nextPosition);
     }
   }
+
 
   public boolean beginTrip() {
     if (tripBeginsCountdown == 0) {
@@ -434,13 +436,13 @@ public class Agent {
 
 
   private void yield() {
+    bufferDebugColor = BUFFER_OCCUPIED_BUFFER_DEBUG_COLOR;
     return;
   }
 
 
   private void go(PVector nextPosition) {
-    yield = 0;
-    yieldingTo = null;
+    bufferDebugColor = DEFAULT_BUFFER_DEBUG_COLOR;
     updatePosition(nextPosition);
   }
 
@@ -485,16 +487,12 @@ public class Agent {
     /* Agent goes slowly if others are in its outter buffer area.
        Otherwise agent goes quickly.
     */
-    // TODO
-    // println(this + ": updateSpeed for agent with mobilityType: "+mobilityType);
-    // ArrayList<int[]> gridOutterBufferAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, outterBufferAreaSize);
-    // Agent otherBufferAreaOccupant = universe.grid.getGridCellsOtherOccupant(gridOutterBufferAreaCells, this);
-    // println("otherBufferAreaOccupant: "+otherBufferAreaOccupant);
-    // if (otherBufferAreaOccupant != null) {
-    //   speed = lowSpeed;
-    // } else {
-    //   speed = highSpeed;
-    // }
-    // println("updated speed to: "+speed);
+    ArrayList<int[]> gridOutterBufferAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, outterBufferAreaSize, bufferOffset);
+    ArrayList<Agent> otherBufferAreaOccupants = universe.grid.getGridCellsOtherOccupants(gridOutterBufferAreaCells, this);
+    if (otherBufferAreaOccupants.size() > 0) {
+      speed = lowSpeed;
+    } else {
+      speed = highSpeed;
+    }
   }
 }

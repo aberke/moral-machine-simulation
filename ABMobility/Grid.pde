@@ -32,6 +32,9 @@ public class Grid {
 
   public PVector offGridLocation;
 
+  // Caches a set of starter buffers
+  private HashMap<Integer, ArrayList<int[]>> untransformedBufferCache;
+
   // Tracks which grid cells are occupied, and by which agent.
   // The agents use this to avoid collisions.
   // It maps (x, y) positions to:
@@ -67,6 +70,8 @@ public class Grid {
 
     // initialize gridCellOccupancy (all start unoccupied)
     gridCellOccupancy = new Agent[DISPLAY_WIDTH][DISPLAY_HEIGHT];
+    // initialize buffer cache
+    untransformedBufferCache = new HashMap<Integer, ArrayList<int[]>>();
   }
 
 
@@ -109,37 +114,56 @@ public class Grid {
   }
 
 
-  public ArrayList<int[]> getGridBufferArea(int aX, int aY, PVector dir, int bufferSize) {
+  public ArrayList<int[]> getGridBufferArea(int aX, int aY, PVector dir, int bufferSize, PVector bufferOffset) {
     // Parameters (aX, aY) define the point for which to return a rectangular buffer
     // 'in front' of, where 'in front' is determined by direction (dir)
     //
     // i.e. if A is at (x, y) and direction is directly above, return rectangle like:
     //  -------
     //  |     |
+    //  |     |
+    //  |     |
     //  ---A---
     //
     // Returns list of [x,y] pairs representing cells in buffer area.
-    ArrayList bufferAreaCells = new ArrayList<int[]>();
-    // Start with cells that are a simple rectangle horizontally aligned around (aX, aY)
-    // The cells are ordered from the right bottom to left top in order to prioritize looking right first
-    //   --> TODO: could improve by starting at point as corner instead
-    for (int x=(aX + bufferSize); x>(aX - bufferSize); x--) {
-      for (int y=(aY + bufferSize); y>(aY - bufferSize); y--) {
-        bufferAreaCells.add(new int[]{x, y});
+    //
+    // Start with a buffer of the desired shape
+    // Translates by buffer offset
+    // rotate it to align with the direction
+    // translate it by (x, y) so that A sits at its base
+
+    // A cache of untransformed starter buffers of given buffer size is memoized
+    ArrayList untransformedBufferCells = untransformedBufferCache.get(bufferSize);
+    if (untransformedBufferCells == null) {
+      // Not cached -- create and add to cache
+      untransformedBufferCells = new ArrayList<int[]>();
+      for (int x=0; x<=(5*bufferSize); x++) {
+        for (int y=bufferSize; y>=(0 - bufferSize); y--) {
+          untransformedBufferCells.add(new int[]{x, y});
+        }
       }
+      // Add to cache
+      untransformedBufferCache.put(bufferSize, untransformedBufferCells);
     }
-    PVector translationVector = dir.normalize().mult(bufferSize);
-    // Translate all of the cells in the simple rectangle in direction dir so that
-    // buffer is 'in front' of (aX, aY)
+    ArrayList bufferAreaCells = new ArrayList<int[]>();
     int[] cell;
-    for (int i=0; i<bufferAreaCells.size(); i++) {
-      cell = (int[])bufferAreaCells.get(i);
+    PVector aXY = new PVector(aX, aY);
+    PVector cellVector;
+    float theta = dir.heading();
+    for (int i=0; i<untransformedBufferCells.size(); i++) {
+      cell = (int[])untransformedBufferCells.get(i);
       int x = cell[0];
       int y = cell[1];
-      int translatedX = x + (int)translationVector.x;
-      int translatedY = y + (int)translationVector.y;
-      int[] translatedCell = new int[]{translatedX, translatedY};
-      bufferAreaCells.set(i, translatedCell);
+      cellVector = new PVector(x, y);
+      // Translate by offset
+      cellVector.add(bufferOffset);
+      // Rotate
+      cellVector.rotate(theta);
+      // Translate to A (x,y)
+      cellVector.add(aXY);
+      // Add the final cell to the buffer areas cells
+      int[] transformedCell = new int[]{(int)cellVector.x, (int)cellVector.y};
+      bufferAreaCells.add(transformedCell);
     }
     return bufferAreaCells;
   }
@@ -157,6 +181,23 @@ public class Grid {
       }
       p.point(x, y);
     }
+  }
+
+
+  public ArrayList<Agent> getGridCellsOtherOccupants(ArrayList<int[]> cells, Agent agent) {
+    ArrayList<Agent> occupants = new ArrayList<Agent>();
+    Agent occupant;
+    int[] cell;
+    for (int i=0; i<cells.size(); i++) {
+      cell = cells.get(i);
+      int x = cell[0];
+      int y = cell[1];
+      occupant = getGridCellOtherOccupant(x, y, agent);
+      if (occupant != null) {
+        occupants.add(occupant);
+      }
+    }
+    return occupants;
   }
 
 
