@@ -1,7 +1,7 @@
 /* Main file for agent based model simulation.
 */
 
-float SCALE = 0.8; //0.6;
+float SCALE = 0.6; //0.6;
 public final int SIMULATION_WIDTH = 2128;
 public final int SIMULATION_HEIGHT = 1330;
 
@@ -22,7 +22,7 @@ public final int NUM_AGENTS_PER_WORLD = 800;
 // One world is where autonomous vehicles are privately owned and operated.
 // The other world is where autonomous vehicles are publicly shared.
 public final int PRIVATE_AVS_WORLD_ID = 1;
-public final int PUBLIC_AVS_WORLD_ID = 2;
+public final int SHARED_AVS_WORLD_ID = 2;
 // The simulation can toggle between these 2 worlds.
 public int WORLD_ID = PRIVATE_AVS_WORLD_ID; // Initialize universe with world of private AVs.
 
@@ -96,10 +96,10 @@ void keyPressed() {
 }
 
 void toggleWorld() {
-  if (WORLD_ID == PUBLIC_AVS_WORLD_ID) {
+  if (WORLD_ID == SHARED_AVS_WORLD_ID) {
     WORLD_ID = PRIVATE_AVS_WORLD_ID;
   } else {
-    WORLD_ID = PUBLIC_AVS_WORLD_ID;
+    WORLD_ID = SHARED_AVS_WORLD_ID;
   }
 }
 

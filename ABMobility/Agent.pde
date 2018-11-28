@@ -388,19 +388,15 @@ public class Agent {
       // Agent has arrived to its nextNode
       updateNextNode();
     } else {
-      // Not arrived to nextNode.
-
+      // Not arrived to nextNode.  Move closer to it.
       yieldOrMove();
     }
   }
 
   public void yieldOrMove() {
-    // move to nextPosition or YIELD
+    // Implements logic to either YIELD or move to nextPosition
 
-    // Check if desired next position is occupied
-    // Get next position by adding direction to position.
-
-
+    // Get next position by adding direction to current position.
     PVector nextPosition = PVector.add(pos, dir);
     int nextPositionX = (int)nextPosition.x;
     int nextPositionY = (int)nextPosition.y;
@@ -408,23 +404,22 @@ public class Agent {
     // Determine if must yield
     boolean mustYield = false;
     // Get all the other agents in the buffer area in order to check if need to yield
-    // Update timer for how long have been yielding to them
-    // At the end, yieldToMap contains only the agents that are in the buffer area and are
-    // not already yielding to this agent
+    // Update timer for how long this has been yielding to these other agents
+    // At the end, yieldToMap contains only the agents that are in the buffer area
     HashMap<Agent, Integer> prevYieldToMap = yieldToMap;
     yieldToMap = new HashMap<Agent, Integer>();
 
     ArrayList<int[]> yieldToAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, innerBufferAreaSize, bufferOffset);
     ArrayList<Agent> yieldTos = universe.grid.getGridCellsOtherOccupants(yieldToAreaCells, this);
-    for (Agent yieldTo: yieldTos) {
-      if (yieldTo.yieldToMap.get(this) != null) {
-        continue;  // This other agent is already yielding to you --> do not yield to them too!
+    for (Agent agent: yieldTos) {
+      if (!shouldYieldTo(agent)) {
+        continue;
       }
       int yieldToWaitTime = 1;
-      if (prevYieldToMap.get(yieldTo) != null) {
-        yieldToWaitTime += prevYieldToMap.get(yieldTo);
+      if (prevYieldToMap.get(agent) != null) {
+        yieldToWaitTime += prevYieldToMap.get(agent);
       }
-      yieldToMap.put(yieldTo, yieldToWaitTime);
+      yieldToMap.put(agent, yieldToWaitTime);
       if (!mustYield && (yieldToWaitTime < YIELD_MAX)) {
         mustYield = true;
       }
@@ -450,6 +445,28 @@ public class Agent {
   }
 
 
+  private boolean shouldYieldTo(Agent otherAgent) {
+    // Returns with this agent should yield to the other agent.
+    // Bikers and pedestrians do not yield to their own type
+    //  - story: they feel safe around each other
+    //  - technical constraint: each mobility type travels on its own map.
+    //    Bike and pedestrian maps are not one way -- overlapping eachother when passing is unavoidable.
+    if (this.isBikerOrPedestrian() && (this.mobilityType == otherAgent.mobilityType)) {
+      return false;
+    }
+    // In the shared AVs world, vehicles always yield to bikers and pedestrians
+    if ((WORLD_ID == SHARED_AVS_WORLD_ID) && (this.mobilityType == CAR) && otherAgent.isBikerOrPedestrian()) {
+      return true;
+    }
+    // Otherwise, yield to the other agent if and only if they are not
+    // already yielding to this agent.
+    if (otherAgent.yieldToMap.get(this) != null) {
+      return false;  // This other agent is already yielding to you --> do not yield to them too!
+    }
+    return true;
+  }
+
+
   private void yield() {
     bufferDebugColor = BUFFER_OCCUPIED_BUFFER_DEBUG_COLOR;
     return;
@@ -459,12 +476,6 @@ public class Agent {
   private void go(PVector nextPosition) {
     bufferDebugColor = DEFAULT_BUFFER_DEBUG_COLOR;
     updatePosition(nextPosition);
-  }
-
-
-  private void goAround(PVector desiredNextPosition) {
-    // TODO: proper goAround -- could update position to go next to desiredNextPosition
-    go(desiredNextPosition);
   }
 
 
@@ -521,14 +532,8 @@ public class Agent {
     }
     return true;
   }
+
+  public boolean isBikerOrPedestrian() {
+    return (this.mobilityType == PED || this.mobilityType == BIKE);
+  }
 }
-
-
-
-
-
-
-
-
-
-
