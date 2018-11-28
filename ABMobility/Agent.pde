@@ -2,7 +2,7 @@
 // These types correspond to building blocks on the gridwhere these
 // types of activity take place.
 public final String RESIDENTIAL = "R";
-public final String OFFICE = "O";
+public final String OFFICE = "0";
 public final String AMENITY = "A";
 
 // Agents wait before their next trip begins so that they do not all flow out at once (there would be too much traffic!)
@@ -106,28 +106,28 @@ public class Agent {
     ms = 0;
     switch(mobilityMotif) {
       case "ROR" :
-        mobilitySequence = new String[] {"R", "O"};
+        mobilitySequence = new String[] {RESIDENTIAL, OFFICE};
         break;
       case "RAAR" :
-        mobilitySequence = new String[] {"R", "A", "A"};
+        mobilitySequence = new String[] {RESIDENTIAL, AMENITY, AMENITY};
         break;
       case "RAOR" :
-        mobilitySequence = new String[] {"R", "A", "O"};
+        mobilitySequence = new String[] {RESIDENTIAL, AMENITY, OFFICE};
         break;
       case "RAR" :
-        mobilitySequence = new String[] {"R", "A"};
+        mobilitySequence = new String[] {RESIDENTIAL, AMENITY};
         break;
       case "ROAOR" :
-        mobilitySequence = new String[] {"R", "O", "A", "O"};
+        mobilitySequence = new String[] {RESIDENTIAL, OFFICE, AMENITY, OFFICE};
         break;
       case "ROAR" :
-        mobilitySequence = new String[] {"R", "O", "A"};
+        mobilitySequence = new String[] {RESIDENTIAL, OFFICE, AMENITY};
         break;
       case "ROOR" :
-        mobilitySequence = new String[] {"R", "O", "O"};
+        mobilitySequence = new String[] {RESIDENTIAL, OFFICE, OFFICE};
         break;
       default:
-        mobilitySequence = new String[] {"R", "O"};
+        mobilitySequence = new String[] {RESIDENTIAL, OFFICE};
         break;
     }
     destBlockId = -1;
