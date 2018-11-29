@@ -249,9 +249,9 @@ public class Agent {
     } else {
       // Good/shared world dummy probabilities:
       if (travelsOffGrid) {
-        mobilityChoiceProbabilities = new float[] {0.2, 0.3, 0.2, 0.3};
+        mobilityChoiceProbabilities = new float[] {0.2, 0.4, 0.2, 0.2};
       } else {
-        mobilityChoiceProbabilities = new float[] {0.1, 0.4, 0.3, 0.2};
+        mobilityChoiceProbabilities = new float[] {0.1, 0.5, 0.3, 0.1};
       }
     }
     // Transform the probability distribution into an array to randomly sample from.
@@ -289,30 +289,16 @@ public class Agent {
 
 
   private void setupBufferArea() {
+    // The buffer area for agents is proportional to the size of their mobility type
     PImage img = glyph[0];
-    // TODO
-    // switch(mobilityType) {
-    //   case CAR :
-        // the buffer goes around it
-        innerBufferAreaSize = (int)(((img.width + 2)*SCALE)/2);
-        outterBufferAreaSize = 2*innerBufferAreaSize;
-        bufferOffset = new PVector(0, (int)((img.width*SCALE)/2));
-      // break;
-      // case BIKE :
-      //   outterBufferAreaSize = BIKE_OUTTER_BUFFER_AREA_SIZE;
-      //   innerBufferAreaSize = BIKE_INNER_BUFFER_AREA_SIZE;
-      // break;
-      // case PED :
-      //   outterBufferAreaSize = PED_OUTTER_BUFFER_AREA_SIZE;
-      //   innerBufferAreaSize = PED_INNER_BUFFER_AREA_SIZE;
-      // break;
-    // }
+    innerBufferAreaSize = (int)(((img.width + 2)*SCALE)/2);
+    outterBufferAreaSize = 2*innerBufferAreaSize;
+    bufferOffset = new PVector(0, (int)((img.width*SCALE)/2));
   }
 
 
   private void calcRoute() {
     pos = new PVector(srcNode.x, srcNode.y);
-
     path = map.graph.aStar(srcNode, destNode);
     // path may be null of nodes are not connected (sad/bad graph, but making graphs is hard)
     if (path == null || srcNode == destNode) {
