@@ -115,14 +115,10 @@ public class RoadNetwork {
     for (int i=0; i < graph.nodes.size(); i++){
       Node node = (Node)graph.nodes.get(i);
       for(int j=0; j<node.links.size(); j++){
-        if (showGlyphs) {
+        if (!mobilityTypeDebug) {
           p.stroke(universe.colorMapBW.get(type));
         } else {
-          if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
-            p.stroke(universe.colorMapBad.get(type));
-          } else {
-            p.stroke(universe.colorMapGood.get(type));
-          }
+          p.stroke(universe.colorMapColorful.get(type));
         }
         p.line(node.x, node.y, ((Connector)node.links.get(j)).n.x, ((Connector)node.links.get(j)).n.y);
       }

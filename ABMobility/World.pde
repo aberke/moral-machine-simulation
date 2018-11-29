@@ -175,7 +175,7 @@ public class World {
     }
 
     for (Agent agent : agents) {
-      agent.draw(pg, showGlyphs);
+      agent.draw(pg);
     }
     pg.endDraw();
   }

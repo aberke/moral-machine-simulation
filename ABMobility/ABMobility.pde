@@ -42,8 +42,8 @@ Universe universe;
 boolean pause = false;
 boolean buildingDebug = false;
 boolean showBackground = true;
-boolean showGlyphs = true;
 boolean showNetwork = false;
+boolean mobilityTypeDebug = false;
 boolean debugOffGridTravel = false;
 boolean debugGridBufferArea = false;
 
@@ -81,8 +81,8 @@ void keyPressed() {
   case ' ':
     showBackground =! showBackground;
     break;
-  case 'g':
-    showGlyphs =! showGlyphs;
+  case 'm':
+    mobilityTypeDebug =! mobilityTypeDebug;
     break;
   case 'n':
     showNetwork =! showNetwork;

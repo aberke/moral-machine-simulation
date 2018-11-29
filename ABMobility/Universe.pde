@@ -6,9 +6,7 @@ public class Universe {
   // Boolean manages threading of world updates.
   private boolean updatingWorld;
 
-  HashMap<String,Integer> colorMap;
-  HashMap<String,Integer> colorMapGood;
-  HashMap<String,Integer> colorMapBad;
+  HashMap<String,Integer> colorMapColorful;
   HashMap<String,Integer> colorMapBW;
   HashMap<String, PImage[]> glyphsMap;
   Grid grid;
@@ -18,25 +16,15 @@ public class Universe {
 
   Universe() {
     // Set up color maps
-    colorMap = new HashMap<String,Integer>();
-    colorMap.put(CAR,color(255,255,255));
-    colorMap.put(BIKE,color(120,52,165));
-    colorMap.put(PED,color(255,227,26));
-
-    colorMapGood = new HashMap<String,Integer>();
-    colorMapGood.put(CAR,color(255,255,255));
-    colorMapGood.put(BIKE,color(0,234,169));
-    colorMapGood.put(PED,color(141,198,255));
-
-    colorMapBad = new HashMap<String,Integer>();
-    colorMapBad.put(CAR,color(255,255,255));
-    colorMapBad.put(BIKE,color(120,52,165));
-    colorMapBad.put(PED,color(255,85,118));
-
     colorMapBW = new HashMap<String,Integer>();
     colorMapBW.put(CAR, #DDDDDD);
     colorMapBW.put(BIKE, #888888);
     colorMapBW.put(PED, #444444);
+
+    colorMapColorful = new HashMap<String,Integer>();
+    colorMapColorful.put(CAR, #ff0000); // red
+    colorMapColorful.put(BIKE, #00ff00);  // green
+    colorMapColorful.put(PED, #0000ff);  // blue
 
     // Create the glyphs and hold in map
     PImage[] carGlyph = new PImage[1];

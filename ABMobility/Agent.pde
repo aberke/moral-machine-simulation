@@ -327,7 +327,7 @@ public class Agent {
   }
 
 
-  public void draw(PGraphics p, boolean glyphs) {
+  public void draw(PGraphics p) {
     if (!isOnTrip || pos == null || path == null) {
       return;
     }
@@ -341,7 +341,7 @@ public class Agent {
       universe.grid.drawGridBufferArea(p, gridInnerBufferAreaCells, bufferDebugColor);
     }
 
-    if (glyphs && (glyph.length > 0)) {
+    if (!mobilityTypeDebug) {
       PImage img = glyph[0];
       if (img != null) {
         p.pushMatrix();
@@ -353,11 +353,7 @@ public class Agent {
       }
     } else {
       p.noStroke();
-      if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
-        p.fill(universe.colorMapBad.get(mobilityType));
-      } else {
-        p.fill(universe.colorMapGood.get(mobilityType));
-      }
+      p.fill(universe.colorMapColorful.get(mobilityType));
       p.ellipse(pos.x, pos.y, 10*SCALE, 10*SCALE);
     }
     
