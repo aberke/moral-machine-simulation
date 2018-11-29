@@ -167,6 +167,7 @@ public class World {
     pg.background(0);
     if(showBackground) {
       PImage background = getBackground();
+      pg.tint(255, 255*BACKGROUND_OPACITY);  // Apply transparency without changing color
       pg.image(background, 0, 0, pg.width, pg.height);
     }
     if (showNetwork) {

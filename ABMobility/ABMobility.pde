@@ -32,6 +32,8 @@ public final String BIKE = "BIKE";
 public final String PED = "PED";  // (Pedestrian)
 public final String SHARED_TRANSIT = "SHARED_TRANSIT";
 
+public final float BACKGROUND_OPACITY = 0.75;
+
 
 Drawer drawer;
 Universe universe;
@@ -39,7 +41,7 @@ Universe universe;
 // Debug variables that can be toggled with key presses:
 boolean pause = false;
 boolean buildingDebug = false;
-boolean showBackground = false;
+boolean showBackground = true;
 boolean showGlyphs = true;
 boolean showNetwork = false;
 boolean debugOffGridTravel = false;
