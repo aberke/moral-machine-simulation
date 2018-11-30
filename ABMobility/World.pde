@@ -193,7 +193,7 @@ public class World {
   }
 
 
-  public void updateGraphics() {
+  public void draw() {
     pg.beginDraw();
 
     pg.background(0);

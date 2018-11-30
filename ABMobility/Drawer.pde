@@ -1,7 +1,6 @@
 
 public class Drawer {
   PGraphics surface;
-
   PShader shader;
   PGraphics pg;
   
@@ -20,11 +19,11 @@ public class Drawer {
     surface.background(0);
     surface.rectMode(CENTER);
     surface.rect(DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+
     if (!pause) {
       world.update();
     }
-    
-    world.updateGraphics();
+    world.draw();
     
     pg.beginDraw();
     pg.shader(shader);

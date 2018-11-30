@@ -53,18 +53,21 @@ void settings() {
   // fullScreen(P3D, SPAN);
 }
 
+
 void setup() {
   surface.setResizable(true);
   frameRate(30);
   world = new World();
   world.InitWorld();
   drawer = new Drawer(this);
-} 
+}
+
 
 void draw() {
   background(0);
   drawer.drawSurface();
 }
+
 
 void keyPressed() {
   switch(key) {
