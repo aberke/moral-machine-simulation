@@ -1,1 +1,1 @@
-processing-java --sketch=`pwd`/ABMobility --run
+processing-java --sketch=`pwd`/ABM --run
