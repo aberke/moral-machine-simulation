@@ -1,5 +1,4 @@
 
-
 // There a buildings in locations on grid, and then
 // there are also 'virtual buildings' that are off the grid.
 // Agents can be assigned to virtual buildings, in which case they
@@ -198,22 +197,6 @@ public class Grid {
       }
     }
     return occupants;
-  }
-
-
-  public Agent getGridCellsOtherOccupant(ArrayList<int[]> cells, Agent agent) {
-    Agent occupant = null;
-    int[] cell;
-    for (int i=0; i<cells.size(); i++) {
-      cell = cells.get(i);
-      int x = cell[0];
-      int y = cell[1];
-      occupant = getGridCellOtherOccupant(x, y, agent);
-      if (occupant != null) {
-        break;
-      }
-    }
-    return occupant;
   }
 
 

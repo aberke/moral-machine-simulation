@@ -71,31 +71,30 @@ void draw() {
 
 void keyPressed() {
   switch(key) {
-  case 'p':
-    pause =! pause;
-    break;
-  case 'b':
-    buildingDebug =! buildingDebug;
-    break;
-  case 'u':
-    debugGridBufferArea =! debugGridBufferArea;
-    break;
-  case ' ':
-    showBackground =! showBackground;
-    break;
-  case 'm':
-    mobilityTypeDebug =! mobilityTypeDebug;
-    break;
-  case 'n':
-    showNetwork =! showNetwork;
-    break;
-  // highlight agents traveling on/off grid
-  case 'z':
-    debugOffGridTravel =! debugOffGridTravel;
-    break;
-  case 'w':
-    toggleWorld();
-    break;
+    case 'p':
+      pause =! pause;
+      break;
+    case 'b':
+      buildingDebug =! buildingDebug;
+      break;
+    case 'u':
+      debugGridBufferArea =! debugGridBufferArea;
+      break;
+    case ' ':
+      showBackground =! showBackground;
+      break;
+    case 'm':
+      mobilityTypeDebug =! mobilityTypeDebug;
+      break;
+    case 'n':
+      showNetwork =! showNetwork;
+      break;
+    case 'z': // highlight agents traveling on/off grid
+      debugOffGridTravel =! debugOffGridTravel;
+      break;
+    case 'w':
+      toggleWorld();
+      break;
   }
 }
 
@@ -106,4 +105,3 @@ void toggleWorld() {
     WORLD_ID = SHARED_AVS_WORLD_ID;
   }
 }
-
