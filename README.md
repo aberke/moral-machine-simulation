@@ -14,6 +14,7 @@ The second world is where AVs are programmed to operate as shared transit, as we
 
 The running simulation allows toggling between these two worlds.  In the first world, one can watch as the traffic of cars accumulates, as well as see how the vehicles do not wait for pedestrians and bikers at intersections.
 In the second world, the movements on the streets change.  The vehicles always yield to bikers and pedestrians.  More people choose to take shared transit, or bike or walk, and the congestion on the streets eases.
+[Watch a recording of the running simulation](output-assets/simulation-toggled-between-worlds-mid-way.mp4) or run it yourself (see below).
 
 
 # About
