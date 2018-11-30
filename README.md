@@ -1,3 +1,24 @@
+### Autonomous Vehicles as Moral Machines
+
+
+This is an agent-based model (ABM) that simulates 2 alternative futures for our streets with autonomous vehicles (AVs).
+The simulation demonstrates ideas for a paper written at the MIT Media Lab. Namely, that if properly designed for, AVs can be vehicles for change and drive forward more equitable streets.
+[See Paper](https://docs.google.com/document/d/1BlcuKNUD1KOblP5JW6aEXMcnS0sMfL_g7d8P9sffAyA/edit?usp=sharing)
+
+![World of private AVs](output-assets/private-av-world-traffic-jam.png)
+The first future world is where AVs operate similarly to the privately owned and operated vehicles of our present streets.
+
+![World of private AVs](output-assets/shared-av-world.png)
+The second world is where AVs are programmed to operate as shared transit, as well as always yield to bikers and pedestrians.
+
+
+The running simulation allows toggling between these two worlds.  In the first world, one can watch as the traffic of cars accumulates, as well as see how the vehicles do not wait for pedestrians and bikers at intersections.
+In the second world, the movements on the streets change.  The vehicles always yield to bikers and pedestrians.  More people choose to take shared transit, or bike or walk, and the congestion on the streets eases.
+
+
+# About
+
+
 This project is a fork of work done by the City Science team at MIT's Media Lab.  It originated as an interactive physical table + simulation for an exhibition at the [Cooper Hewitt Museum](https://www.cooperhewitt.org/2018/11/08/cooper-hewitt-explores-the-future-of-mobility-in-new-exhibition/).
 
 Much credit goes to:
@@ -6,8 +27,14 @@ Kent Larson, Maitane Iruretagoyena, Guadalupe Fernandez, Margaret Church, Gabrie
 
 See https://github.com/CityScope/CS_Cooper-Hewitt
 
+# About Agent-based Models and Streets
 
-# Moral Machines
+City streets can be viewed as autonomous systems.  At any given time, there are countless independent, asynchronous decisions being made by the people that move upon them.  These independent decisions aggregate into predictable mobility patterns on the streets with a variety of determining factors: the topology of streets and the rules that govern them, commuting patterns, incentives to take public transit vs private car vs walk, etc.
+
+[An agent-based model (ABM) is a class of computational models for simulating the actions and interactions of autonomous agents (both individual or collective entities such as organizations or groups) with a view to assessing their effects on the system as a whole.](https://en.wikipedia.org/wiki/Agent-based_model)
+
+
+# About AVs and our Future Streets
 
 Our future streets will be driven by autonomous vehicles (AVs), and the introduction of AVs presents an opportunity to update how our streets are used.  What societal values should be embedded in the algorithms that drive them?  If properly designed, programmed, and governed, AVs can improve public health, mobility and morality on our future streets.
 
@@ -43,9 +70,9 @@ Throughout their trips, agents update how they choose to move on the streets.  C
 
 The world of private AVs more closely represents current streets and the rules and values driving them: Vehicles carefully avoid collisions, they yield to other vehicles at intersections, but do not go out of their way to yield to bikes or pedestrians.  
 
-In the world where AVs are designed to operate as shared transit, AV driving algorithms behave differently.  For example, they yield to bikes and pedestrians waiting in intersections.
+In the world where AVs are designed to operate as shared transit, AV driving algorithms behave differently.  For example, they yield to bikes and pedestrians rather than making bikers and pedestrians wait for them to pass.
 
-The differt algorithms for private vs shared AVs leads to differing behaviors on the simulated streets.
+The different algorithms for private vs shared AVs leads to differing behaviors on the simulated streets.
 In the __shared__ world:
 - Agents take shared vehicles instead of private cars.
 - Traveling by bike or on foot is more efficient (and safer) because vehicles yield to them.  Thus more agents choose to travel by bike or foot.
@@ -53,6 +80,38 @@ In the __shared__ world:
 The resulting change in congestion and mobility on the streets can be viewed in the simulation.
 
 
-### Run Code Locally
+### Mobility Types
+
+![Vehicle](ABM/data/image/glyphs/car.gif)
+Vehicle
+
+![Bike 0](ABM/data/image/glyphs/bike-0.gif)
+Bike
+
+![human 0](ABM/data/image/glyphs/human-0.gif)
+Pedestrian
+
+![mobility types](output-assets/mobility-types.png)
+
+
+
+
+## Run Code
 
 `source run.sh`
+
+
+### Options
+
+Once running, the following can be toggled
+
+key | effect
+--- | ---
+p | pause
+w | toggle between worlds: private vs shared AVs
+*space* | hide/show background
+n | hide/show networks for AVs/bikes/pedestrians
+m | hide/show color coded mobility types
+b | hide/show buildings
+z | hide/show debug color for agents that move on/off grid
+u | hide/show collision detection buffers
