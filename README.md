@@ -2,8 +2,11 @@
 
 
 This is an agent-based model (ABM) that simulates 2 alternative futures for our streets with autonomous vehicles (AVs).
-The simulation demonstrates ideas for a paper written at the MIT Media Lab. Namely, that if properly designed for, AVs can be vehicles for change and drive forward more equitable streets.
+The simulation demonstrates ideas for a paper written at the MIT Media Lab about how if AV driving algorithms are properly designed, they can be vehicles of change that drive forward more equitable streets.
 [See Paper](https://docs.google.com/document/d/1BlcuKNUD1KOblP5JW6aEXMcnS0sMfL_g7d8P9sffAyA/edit?usp=sharing)
+
+
+A view of 2 alternative future worlds with AVs in their streets:
 
 ![World of private AVs](output-assets/private-av-world-traffic-jam.png)
 The first future world is where AVs operate similarly to the privately owned and operated vehicles of our present streets.
@@ -19,20 +22,15 @@ In the second world, the movements on the streets change.  The vehicles always y
 
 # About
 
+### Credit
 
 This project is a fork of work done by the City Science team at MIT's Media Lab.  It originated as an interactive physical table + simulation for an exhibition at the [Cooper Hewitt Museum](https://www.cooperhewitt.org/2018/11/08/cooper-hewitt-explores-the-future-of-mobility-in-new-exhibition/).
 
 Much credit goes to:
-*(in no particular order)*
-Kent Larson, Maitane Iruretagoyena, Guadalupe Fernandez, Margaret Church, Gabriela Advincula, Ronan Doorley, Yasushi Sakai, Arnaud Grignard, Ariel Noyman, Luis Alberto Alonso Pastor
+*(in alphabetical order)*
+Ariel Noyman, Arnaud Grignard, Carson Smuts, Gabriela Advincula, Guadalupe Fernandez, Kent Larson, Luis Alberto Alonso Pastor, Maitane Iruretagoyena, Margaret Church, Markus ElKatsha, Ronan Doorley, Yan Zhang, Yasushi Sakai
 
 See https://github.com/CityScope/CS_Cooper-Hewitt
-
-# About Agent-based Models and Streets
-
-City streets can be viewed as autonomous systems.  At any given time, there are countless independent, asynchronous decisions being made by the people that move upon them.  These independent decisions aggregate into predictable mobility patterns on the streets with a variety of determining factors: the topology of streets and the rules that govern them, commuting patterns, incentives to take public transit vs private car vs walk, etc.
-
-[An agent-based model (ABM) is a class of computational models for simulating the actions and interactions of autonomous agents (both individual or collective entities such as organizations or groups) with a view to assessing their effects on the system as a whole.](https://en.wikipedia.org/wiki/Agent-based_model)
 
 
 # About AVs and our Future Streets
@@ -57,13 +55,15 @@ A world where AVs operate as shared transit.  They are programmed with new prior
 - __environmental sustainability__: fewer private vehicles on the road means less pollution
 
 
-### Agent Based Model
 
-This is an agent based model.
-Each car/bike/pedestrian in the simulation is the visualization of a (human) agent's behavior within the model.
+# Agent-based Model for this Simulation of Streets
+
+City streets can be viewed as autonomous systems.  At any given time, there are countless independent, asynchronous decisions being made by the people that move upon them.  These independent decisions aggregate into predictable mobility patterns on the streets with a variety of determining factors: the topology of streets and the rules that govern them, commuting patterns, incentives to take public transit vs private car vs walk, etc.
+
+This simulation of streets uses an agent-based model.  [An agent-based model (ABM) is a class of computational models for simulating the actions and interactions of autonomous agents (both individual or collective entities such as organizations or groups) with a view to assessing their effects on the system as a whole.](https://en.wikipedia.org/wiki/Agent-based_model).  In this simulation, each car/bike/pedestrian is the visualization of a (human) agent's behavior within the model.
 The data for the agent model is from people's responses to the US census and National Household Travel Survey.  The subset of data used is for people living in the New York + Newark areas.  For data science details see https://github.com/CityScope/CS_activityBased
 
-Agents in the model take trips within the simulated city.  They travel to and from their residences, offices, and amenities.  These agents make realtime mobility decisions for each trip they take: whether to travel by car, shared transit, bike, or as pedestrians.
+Agents in the model take trips within the simulated city.  They travel to and from their residences, offices, and amenities.  These agents make realtime mobility decisions for each trip they take: whether to travel by private car, shared transit, bike, or as pedestrians.
 These decisions are determined by the agents' personal attributes from the data, the distance they are traveling, and whether they are in the __(1) private__ vs __(2) shared__ world.
 
 #### Traveling in the Private vs Shared Future Worlds
