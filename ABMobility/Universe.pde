@@ -3,9 +3,6 @@ public class Universe {
 
   private World world;
 
-  // Boolean manages threading of world updates.
-  private boolean updatingWorld;
-
   HashMap<String,Integer> colorMapColorful;
   HashMap<String,Integer> colorMapBW;
   HashMap<String, PImage[]> glyphsMap;
@@ -43,7 +40,6 @@ public class Universe {
 
     grid = new Grid();
     world = new World(glyphsMap);
-    updatingWorld = false;
 
     shader = loadShader("mask.glsl");
     shader.set("width", float(DISPLAY_WIDTH));
@@ -57,22 +53,10 @@ public class Universe {
    }
 
    void update() {
-    // Update the worlds and models + agents they contain
-    // in separate threads than the main thread which draws
-    // the graphics.
     if (pause) {
       return;
     }
-    if (!updatingWorld) {
-      updatingWorld = true;
-      Thread t = new Thread(new Runnable() {
-        public void run(){
-          world.update();
-          updatingWorld = false;
-        }
-      });
-      t.start();
-    }
+    world.update();
    }
 
   void updateGraphics() {
