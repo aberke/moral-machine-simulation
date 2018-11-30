@@ -167,7 +167,7 @@ public class Agent {
     boolean destOnGrid = buildingBlockOnGrid(destBlockId);
     travelsOffGrid = !(srcOnGrid && destOnGrid);
 
-    destBlockLocation = universe.grid.getBuildingLocationById(destBlockId);
+    destBlockLocation = world.grid.getBuildingLocationById(destBlockId);
 
     // Mobility choice partly determined by distance
     // agent must travel, so it is determined after travelsOffGrid
@@ -203,7 +203,7 @@ public class Agent {
 
   public Node getNodeByBlockId(int blockId) {
     if (buildingBlockOnGrid(blockId)) {
-      return map.getRandomNodeInsideROI(universe.grid.getBuildingCenterPosistionPerId(blockId), BUILDING_SIZE);
+      return map.getRandomNodeInsideROI(world.grid.getBuildingCenterPosistionPerId(blockId), BUILDING_SIZE);
     } else {
       return map.getRandomNodeOffGrid();
     }
@@ -320,11 +320,11 @@ public class Agent {
 
     if (debugGridBufferArea) {
       // Outter buffer area is where agent goes more slowly
-      ArrayList<int[]> gridOutterBufferAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, outterBufferAreaSize, bufferOffset);
-      universe.grid.drawGridBufferArea(p, gridOutterBufferAreaCells, bufferDebugColor);
+      ArrayList<int[]> gridOutterBufferAreaCells = world.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, outterBufferAreaSize, bufferOffset);
+      world.grid.drawGridBufferArea(p, gridOutterBufferAreaCells, bufferDebugColor);
       // Inner buffer area is where agent yields
-      ArrayList<int[]> gridInnerBufferAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, innerBufferAreaSize, bufferOffset);
-      universe.grid.drawGridBufferArea(p, gridInnerBufferAreaCells, bufferDebugColor);
+      ArrayList<int[]> gridInnerBufferAreaCells = world.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, innerBufferAreaSize, bufferOffset);
+      world.grid.drawGridBufferArea(p, gridInnerBufferAreaCells, bufferDebugColor);
     }
 
     if (!mobilityTypeDebug) {
@@ -339,7 +339,7 @@ public class Agent {
       }
     } else {
       p.noStroke();
-      p.fill(universe.colorMapColorful.get(mobilityType));
+      p.fill(world.colorMapColorful.get(mobilityType));
       p.ellipse(pos.x, pos.y, 10*SCALE, 10*SCALE);
     }
     
@@ -391,8 +391,8 @@ public class Agent {
     HashMap<Agent, Integer> prevYieldToMap = yieldToMap;
     yieldToMap = new HashMap<Agent, Integer>();
 
-    ArrayList<int[]> yieldToAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, innerBufferAreaSize, bufferOffset);
-    ArrayList<Agent> yieldTos = universe.grid.getGridCellsOtherOccupants(yieldToAreaCells, this);
+    ArrayList<int[]> yieldToAreaCells = world.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, innerBufferAreaSize, bufferOffset);
+    ArrayList<Agent> yieldTos = world.grid.getGridCellsOtherOccupants(yieldToAreaCells, this);
     for (Agent agent: yieldTos) {
       if (!shouldYieldTo(agent)) {
         continue;
@@ -480,12 +480,12 @@ public class Agent {
     }
     if (pos != null) {
       // Leave current position on grid
-      universe.grid.emptyGridCell((int)pos.x, (int)pos.y);
+      world.grid.emptyGridCell((int)pos.x, (int)pos.y);
     }
     pos = newPosition;
     if (pos != null) { // pos is set to null when new trip started
       // Enter new position on grid
-      universe.grid.occupyGridCell((int)pos.x, (int)pos.y, this);
+      world.grid.occupyGridCell((int)pos.x, (int)pos.y, this);
     }
   }
 
@@ -494,8 +494,8 @@ public class Agent {
     /* Agent goes slowly if others are in its outter buffer area.
        Otherwise agent goes quickly.
     */
-    ArrayList<int[]> gridOutterBufferAreaCells = universe.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, outterBufferAreaSize, bufferOffset);
-    ArrayList<Agent> otherBufferAreaOccupants = universe.grid.getGridCellsOtherOccupants(gridOutterBufferAreaCells, this);
+    ArrayList<int[]> gridOutterBufferAreaCells = world.grid.getGridBufferArea((int)pos.x, (int)pos.y, dir, outterBufferAreaSize, bufferOffset);
+    ArrayList<Agent> otherBufferAreaOccupants = world.grid.getGridCellsOtherOccupants(gridOutterBufferAreaCells, this);
     if (otherBufferAreaOccupants.size() > 0) {
       speed = lowSpeed;
     } else {

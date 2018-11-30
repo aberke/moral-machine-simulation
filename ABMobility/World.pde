@@ -1,6 +1,11 @@
 
 public class World {
   PGraphics pg;
+  HashMap<String,Integer> colorMapColorful;
+  HashMap<String,Integer> colorMapBW;
+
+  Grid grid;
+
 
   // Networks is a mapping from network name to RoadNetwork.
   // e.g. CAR --> RoadNetwork, ... etc
@@ -9,16 +14,43 @@ public class World {
   private ArrayList<Agent> agents;
 
   // There are two backgrounds to show depending on world.
-  private PImage background_private_world;
-  private PImage background_public_world;
+  private PImage backgroundPrivateWorld;
+  private PImage backgroundSharedWorld;
+
   
-  World(HashMap<String, PImage[]> _glyphsMap) {
-    glyphsMap = _glyphsMap;
+  World() {
+    // Set up color maps
+    colorMapBW = new HashMap<String,Integer>();
+    colorMapBW.put(CAR, #DDDDDD);
+    colorMapBW.put(BIKE, #888888);
+    colorMapBW.put(PED, #444444);
+    colorMapColorful = new HashMap<String,Integer>();
+    colorMapColorful.put(CAR, #ff0000); // red
+    colorMapColorful.put(BIKE, #00ff00);  // green
+    colorMapColorful.put(PED, #0000ff);  // blue
+
+    // Create the glyphs and hold in map
+    PImage[] carGlyph = new PImage[1];
+    carGlyph[0] = loadImage("image/glyphs/car.gif");
+    PImage[] bikeGlyph = new PImage[2];
+    bikeGlyph[0] = loadImage("image/glyphs/bike-0.gif");
+    bikeGlyph[1] = loadImage("image/glyphs/bike-1.gif");
+    PImage[] pedGlyph = new PImage[3];
+    pedGlyph[0] = loadImage("image/glyphs/human-0.gif");
+    pedGlyph[1] = loadImage("image/glyphs/human-1.gif");
+    pedGlyph[2] = loadImage("image/glyphs/human-2.gif");
+    glyphsMap = new HashMap<String, PImage[]>();
+    glyphsMap.put(CAR, carGlyph);
+    glyphsMap.put(BIKE, bikeGlyph);
+    glyphsMap.put(PED, pedGlyph);
 
     // Load/cache backgrounds.
-    background_private_world = loadImage("image/background/background-red.png");
-    background_public_world = loadImage("image/background/background-white.png");
-    // background_public_world = loadImage("image/background/background-green.png");
+    backgroundPrivateWorld = loadImage("image/background/background-red.png");
+    backgroundSharedWorld = loadImage("image/background/background-white.png");
+    // backgroundSharedWorld = loadImage("image/background/background-green.png");
+
+    // Create city grid
+    grid = new Grid();
 
     // Create the road networks.
     RoadNetwork carNetwork = new RoadNetwork("network/car.geojson", CAR);
@@ -190,9 +222,9 @@ public class World {
 
   public PImage getBackground() {
     if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
-      return background_private_world;
+      return backgroundPrivateWorld;
     } else {
-      return background_public_world;
+      return backgroundSharedWorld;
     }
   }
 }

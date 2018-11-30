@@ -24,7 +24,7 @@ public final int NUM_AGENTS_PER_WORLD = 800;
 public final int PRIVATE_AVS_WORLD_ID = 1;
 public final int SHARED_AVS_WORLD_ID = 2;
 // The simulation can toggle between these 2 worlds.
-public int WORLD_ID = PRIVATE_AVS_WORLD_ID; // Initialize universe with world of private AVs.
+public int WORLD_ID = PRIVATE_AVS_WORLD_ID;
 
 // Constants to name mobility types:
 public final String CAR = "CAR";
@@ -36,7 +36,7 @@ public final float BACKGROUND_OPACITY = 0.75;
 
 
 Drawer drawer;
-Universe universe;
+World world;
 
 // Debug variables that can be toggled with key presses:
 boolean pause = false;
@@ -56,14 +56,13 @@ void settings() {
 void setup() {
   surface.setResizable(true);
   frameRate(30);
+  world = new World();
+  world.InitWorld();
   drawer = new Drawer(this);
-  universe = new Universe();
-  universe.InitUniverse();
 } 
 
 void draw() {
   background(0);
-  universe.updateGraphics();
   drawer.drawSurface();
 }
 

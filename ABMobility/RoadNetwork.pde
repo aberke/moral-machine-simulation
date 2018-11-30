@@ -116,9 +116,9 @@ public class RoadNetwork {
       Node node = (Node)graph.nodes.get(i);
       for(int j=0; j<node.links.size(); j++){
         if (!mobilityTypeDebug) {
-          p.stroke(universe.colorMapBW.get(type));
+          p.stroke(world.colorMapBW.get(type));
         } else {
-          p.stroke(universe.colorMapColorful.get(type));
+          p.stroke(world.colorMapColorful.get(type));
         }
         p.line(node.x, node.y, ((Connector)node.links.get(j)).n.x, ((Connector)node.links.get(j)).n.y);
       }
@@ -128,7 +128,7 @@ public class RoadNetwork {
 
   public Node getRandomNodeInsideROI(PVector pos, int size){
     ArrayList<Node> nodes = new ArrayList<Node>();
-    Node node; 
+    Node node;
     for (int i=0; i<graph.nodes.size(); i++) {
       node = (Node) graph.nodes.get(i);
         if(((node.x>pos.x-size/2) && (node.x)<pos.x+size/2) &&

@@ -1,30 +1,38 @@
 
 public class Drawer {
-  PGraphics offscreenSurface;
   PGraphics surface;
+
+  PShader shader;
+  PGraphics pg;
   
   Drawer(PApplet parent) {
-    offscreenSurface = createGraphics(DISPLAY_WIDTH, DISPLAY_HEIGHT, P2D);
     surface = createGraphics(DISPLAY_WIDTH, DISPLAY_HEIGHT, P2D);
+    shader = loadShader("mask.glsl");
+    shader.set("width", float(DISPLAY_WIDTH));
+    shader.set("height", float(DISPLAY_HEIGHT));
+    shader.set("sampler", world.pg);
+    pg = createGraphics(DISPLAY_WIDTH, DISPLAY_HEIGHT, P2D);
   }
   
   void drawSurface(){
-    offscreenSurface.beginDraw();
-    offscreenSurface.clear();
-    offscreenSurface.background(0);
-    offscreenSurface.fill(125);
-    offscreenSurface.rectMode(CENTER);
-    offscreenSurface.stroke(#FF0000);
-    offscreenSurface.noFill();
-    offscreenSurface.rect(DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-    universe.update();
-    universe.draw(offscreenSurface);
-    universe.grid.draw(offscreenSurface);
-    offscreenSurface.endDraw();
     surface.beginDraw();
     surface.clear();
-    surface.image(offscreenSurface, 0, 0);
-  
+    surface.background(0);
+    surface.rectMode(CENTER);
+    surface.rect(DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    if (!pause) {
+      world.update();
+    }
+    
+    world.updateGraphics();
+    
+    pg.beginDraw();
+    pg.shader(shader);
+    pg.rect(0, 0, pg.width, pg.height);
+    surface.image(pg, 0, 0);
+    pg.endDraw();
+    
+    world.grid.draw(surface);
     surface.endDraw();
     image(surface, 0, 0);
   }
