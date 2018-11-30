@@ -68,9 +68,9 @@ public class World {
   }
   
   
-  public void InitWorld() {
+  public void init() {
     for (Agent a : agents) {
-      a.initAgent();
+      a.init();
     }  
   }
 

@@ -105,7 +105,7 @@ public class Agent {
   }
   
   
-  public void initAgent() {
+  public void init() {
     yieldToMap = new HashMap<Agent, Integer>();
     // Set up mobility sequence.  The agent travels through this sequence.
     // Currently sequences with repeat trip types (e.g. RAAR) are not meaningfully

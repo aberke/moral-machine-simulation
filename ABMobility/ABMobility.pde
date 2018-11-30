@@ -58,7 +58,7 @@ void setup() {
   surface.setResizable(true);
   frameRate(30);
   world = new World();
-  world.InitWorld();
+  world.init();
   drawer = new Drawer(this);
 }
 
