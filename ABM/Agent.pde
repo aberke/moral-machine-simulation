@@ -36,6 +36,7 @@ public class Agent {
   private int residentialBlockId;
   private int officeBlockId;
   private int amenityBlockId;
+  private int householdLifecycle;
   private int householdIncome;
   private int occupationType;
   private int age;
@@ -89,13 +90,14 @@ public class Agent {
   Agent(HashMap<String, RoadNetwork> _networks, HashMap<String, PImage[]> _glyphsMap,
         int _residentialBlockId, int _officeBlockId, int _amenityBlockId,
         String _mobilityMotif,
-        int _householdIncome, int _occupationType, int _age){
+        int _householdLifecycle, int _householdIncome, int _occupationType, int _age){
     networks = _networks;
     glyphsMap = _glyphsMap;
     residentialBlockId = _residentialBlockId;
     officeBlockId = _officeBlockId;
     amenityBlockId = _amenityBlockId;
     mobilityMotif = _mobilityMotif;
+    householdLifecycle = _householdLifecycle;
     householdIncome = _householdIncome;
     occupationType = _occupationType;
     age = _age;
