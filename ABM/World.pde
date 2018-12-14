@@ -99,10 +99,11 @@ public class World {
       }
 
       String mobilityMotif = getMobilityMotif(row);
+      int householdLifecycle = row.getInt("hh_lifeCycle");
       int householdIncome = row.getInt("hh_income");
       int occupationType = row.getInt("occupation_type");
       int age = row.getInt("age");
-      Agent a = new Agent(networks, glyphsMap, residentialBlockId, officeBlockId, amenityBlockId, mobilityMotif, householdIncome, occupationType, age);
+      Agent a = new Agent(networks, glyphsMap, residentialBlockId, officeBlockId, amenityBlockId, mobilityMotif, householdLifecycle, householdIncome, occupationType, age);
       agents.add(a);
 
       counter++;
@@ -161,11 +162,12 @@ public class World {
     } while (!validAgentBlocks(rBlockId, oBlockId, aBlockId));
 
     String mobilityMotif = "ROR";
+    int householdLifecycle = int(random(11)) + 1;  // [1, 11]
     int householdIncome = int(random(12));  // [0, 11]
     int occupationType = int(random(5)) + 1;  // [1, 5]
     int age = int(random(100));
 
-    agents.add(new Agent(networks, glyphsMap, rBlockId, oBlockId, aBlockId, mobilityMotif, householdIncome, occupationType, age)); 
+    agents.add(new Agent(networks, glyphsMap, rBlockId, oBlockId, aBlockId, mobilityMotif, householdLifecycle, householdIncome, occupationType, age)); 
   }
 
 
