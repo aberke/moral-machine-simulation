@@ -99,6 +99,10 @@ Pedestrian
 
 ## Run Code
 
+The simulation is implemented with [Processing](https://processing.org/).  Running the code requires downloading Processing and installing the libraries that the project imports which include [pathfinder](http://www.robotacid.com/PBeta/AILibrary/Pathfinder/index.html)
+
+Download/clone repository and `cd` into it.
+
 `source run.sh`
 
 
