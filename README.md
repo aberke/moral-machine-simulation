@@ -83,17 +83,7 @@ The resulting change in congestion and mobility on the streets can be viewed in 
 
 ### Mobility Types
 
-![Vehicle](ABM/data/image/glyphs/car.gif)
-Vehicle
-
-![Bike 0](ABM/data/image/glyphs/bike-0.gif)
-Bike
-
-![human 0](ABM/data/image/glyphs/human-0.gif)
-Pedestrian
-
 ![mobility types](output-assets/mobility-types.png)
-
 
 
 
