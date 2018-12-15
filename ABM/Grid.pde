@@ -4,6 +4,13 @@
 // Agents can be assigned to virtual buildings, in which case they
 // travel between buildings on the grid and locations off the grid.
 
+
+// Enumeration of distances between buildings
+enum BuildingDistance {
+  DISTANCE_FAR, DISTANCE_MEDIUM_FAR, DISTANCE_MEDIUM_SHORT, DISTANCE_SHORT;
+}
+
+
 // Note: In the original implemntation that this project was forked from,
 // buildings were interactive and could be moved on and off the grid.
 // In that implentation, building location on the grid was not static.
@@ -12,6 +19,7 @@
 // Building IDs: [0, 1, ...count]
 public static int BUILDINGS_ON_GRID_COUNT = 18;
 public static int TOTAL_BULIDINGS_COUNT = 24;  // As per blocks.csv datafile
+
 
 public int getRandomBuildingBlockId() {
   return int(random(TOTAL_BULIDINGS_COUNT));
@@ -220,4 +228,23 @@ public class Grid {
     return buildings.get(id).loc;
   }
 
+
+  public BuildingDistance getBuildingDistance(int buildingId1, int buildingId2) {
+    /* Returns a contrived distance between two buildings. */
+    PVector buildingLoc1 = getBuildingLocationById(buildingId1);
+    PVector buildingLoc2 = getBuildingLocationById(buildingId2);
+    // If both buildings are off the grid, agent travels through grid
+    // for a very far distance.
+    if ((buildingLoc1 == offGridLocation) || (buildingLoc2 == offGridLocation)) {
+      return BuildingDistance.DISTANCE_FAR;
+    }
+    float dist = buildingLoc1.dist(buildingLoc2);
+    if (dist < 2) {
+      return BuildingDistance.DISTANCE_SHORT;
+    } else if (dist < 4) {
+      return BuildingDistance.DISTANCE_MEDIUM_SHORT;
+    } else {
+      return BuildingDistance.DISTANCE_MEDIUM_FAR;
+    }
+  }
 }

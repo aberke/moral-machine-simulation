@@ -89,26 +89,28 @@ public class World {
     /* Creates a certain number of agents from preprocessed data. */
     Table simPopTable = loadTable(SIMULATED_POPULATION_DATA_FILEPATH, "header");
     int counter = 0;
-    for (TableRow row : simPopTable.rows()) {
-      int residentialBlockId = row.getInt("residential_block");
-      int officeBlockId = row.getInt("office_block");
-      int amenityBlockId = row.getInt("amenity_block");
+    while (counter < num) {
+      for (TableRow row : simPopTable.rows()) {
+        int residentialBlockId = row.getInt("residential_block");
+        int officeBlockId = row.getInt("office_block");
+        int amenityBlockId = row.getInt("amenity_block");
 
-      if (!validAgentBlocks(residentialBlockId, officeBlockId, amenityBlockId)) {
-        continue;
-      }
+        if (!validAgentBlocks(residentialBlockId, officeBlockId, amenityBlockId)) {
+          continue;
+        }
 
-      String mobilityMotif = getMobilityMotif(row);
-      int householdLifecycle = row.getInt("hh_lifeCycle");
-      int householdIncome = row.getInt("hh_income");
-      int occupationType = row.getInt("occupation_type");
-      int age = row.getInt("age");
-      Agent a = new Agent(networks, glyphsMap, residentialBlockId, officeBlockId, amenityBlockId, mobilityMotif, householdLifecycle, householdIncome, occupationType, age);
-      agents.add(a);
+        String mobilityMotif = getMobilityMotif(row);
+        int householdLifecycle = row.getInt("hh_lifeCycle");
+        int householdIncome = row.getInt("hh_income");
+        int occupationType = row.getInt("occupation_type");
+        int age = row.getInt("age");
+        Agent a = new Agent(networks, glyphsMap, residentialBlockId, officeBlockId, amenityBlockId, mobilityMotif, householdLifecycle, householdIncome, occupationType, age);
+        agents.add(a);
 
-      counter++;
-      if (counter >= num) {
-        break;
+        counter++;
+        if (counter >= num) {
+          break;
+        }
       }
     }
   }
