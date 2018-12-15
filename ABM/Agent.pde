@@ -6,7 +6,7 @@ public final String OFFICE = "0";
 public final String AMENITY = "A";
 
 // Agents wait before their next trip begins so that they do not all flow out at once (there would be too much traffic!)
-public final int TRIP_START_COUNTDOWN_MAX = 10*NUM_AGENTS_PER_WORLD;  // Wait up to this many passes
+public final int TRIP_START_COUNTDOWN_MAX = 4*NUM_AGENTS_PER_WORLD;  // Wait up to this many passes
 
 // When agents use shared transit as their travel mode, they join another vehicle (a shared AV).
 // Implementation: A new agent is not placed on the grid.
@@ -57,7 +57,6 @@ public class Agent {
   private int srcBlockId;  // source block for current trip
   private int destBlockId;  // destination block for current trip
   // Keeps track of destination location so that if block is moved, destination can update
-  private PVector destBlockLocation;
   private String mobilityType;
   private PImage[] glyph;
   private PVector pos;
@@ -83,7 +82,7 @@ public class Agent {
 
   // There are small waits before new trips begin
   // These waits are randomly chosen to stagger when agents enter grid.
-  private boolean isOnTrip;
+  public boolean isOnTrip;
   private int tripBeginsCountdown;
 
 
@@ -169,11 +168,9 @@ public class Agent {
     boolean destOnGrid = buildingBlockOnGrid(destBlockId);
     travelsOffGrid = !(srcOnGrid && destOnGrid);
 
-    destBlockLocation = world.grid.getBuildingLocationById(destBlockId);
-
     // Mobility choice partly determined by distance
-    // agent must travel, so it is determined after travelsOffGrid
-    // status is determined.
+    // agent must travel, so it is determined after src and
+    // dest blocks are determined.
     setupMobilityType();
     if (mobilityType == SHARED_TRANSIT) {
       onSharedTransitTrip = true;
@@ -226,34 +223,52 @@ public class Agent {
 
   private String chooseMobilityType() {
     /* Agent makes a choice about which mobility
-     * mode type to use for route.
-     * This is based on activityBased model.
+     * mode type to use for the given trip between the source and destination
+     * blocks.
+     * This is based on model computed from National Household Travel Survey data.
+     * See https://github.com/CityScope/CS_activityBased
     */
-    // TODO(aberke): Use decision tree code from activityBased model.
-    // Decision will be based on a agent path + attributes from simPop.csv.
-    // Currently randomly selects between car/bike/ped based on dummy
-    // probability distributions.
 
     // How likely agent is to choose one mode of mobility over another depends
     // on whether agent is in 'bad' vs 'good' world.
-    // It also depends on how far an agent must travel.  Agents from traveling to
-    // or from a location off the main grid are traveling further and more likely
-    // to take a car.
+    // It also depends on how far an agent must travel, the agent's mobility motif,
+    // as well as personal attributes.
+
+    BuildingDistance travelDistance = world.grid.getBuildingDistance(srcBlockId, destBlockId);
+
     String[] mobilityTypes = {CAR, BIKE, PED, SHARED_TRANSIT};
     float[] mobilityChoiceProbabilities;
     if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
-      // Bad/private world dummy probabilities:
-      if (travelsOffGrid) {
-        mobilityChoiceProbabilities = new float[] {1, 0, 0, 0};
-      } else {
-        mobilityChoiceProbabilities = new float[] {0.75, 0.15, 0.1, 0};
+      // For private AVs world, mobility choice probabilities are based
+      // on a model of the present world.
+      // The following decision tree is implemented below: https://github.com/CityScope/CS_activityBased/blob/master/results/mode_choice.py
+      if (travelDistance == BuildingDistance.DISTANCE_FAR) {
+        if (mobilityMotif == "RAAR") {
+          mobilityChoiceProbabilities = new float[] {0.51, 0.17, 0.01, 0.31};
+        } else {
+          mobilityChoiceProbabilities = new float[] {0.30, 0.07, 0.01, 0.62};
+        }
+      } else if (travelDistance == BuildingDistance.DISTANCE_MEDIUM_FAR) {
+        if (householdLifecycle <= 5.5) {
+          mobilityChoiceProbabilities = new float[] {0.19, 0.50, 0.09, 0.22};
+        } else {
+          mobilityChoiceProbabilities = new float[] {0.48, 0.17, 0.11, 0.24};
+        }
+      } else if (travelDistance == BuildingDistance.DISTANCE_MEDIUM_SHORT) {
+        if (mobilityMotif == "ROOR") {
+          mobilityChoiceProbabilities = new float[] {0.00, 0.84, 0.14, 0.02};
+        } else {
+          mobilityChoiceProbabilities = new float[] {0.15, 0.25, 0.56, 0.04};
+        }
+      } else {  // travelDistance == BuildingDistance.DISTANCE_SHORT
+        mobilityChoiceProbabilities = new float[] {0.04, 0.23, 0.71, 0.02};
       }
     } else {
-      // Good/shared world dummy probabilities:
-      if (travelsOffGrid) {
-        mobilityChoiceProbabilities = new float[] {0.2, 0.4, 0.2, 0.2};
+      // Good/shared world (fictitious) probabilities:
+      if (travelDistance == BuildingDistance.DISTANCE_FAR) {
+        mobilityChoiceProbabilities = new float[] {0.07, 0.45, 0.2, 0.28};
       } else {
-        mobilityChoiceProbabilities = new float[] {0.1, 0.5, 0.3, 0.1};
+        mobilityChoiceProbabilities = new float[] {0.02, 0.51, 0.35, 0.12};
       }
     }
     // Transform the probability distribution into an array to randomly sample from.
