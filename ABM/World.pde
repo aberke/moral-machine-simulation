@@ -76,7 +76,7 @@ public class World {
 
 
   public void createAgents() {
-    int agents = NUM_AGENTS_PER_WORLD;
+    int agents = NUM_AGENTS;
     if (INIT_AGENTS_FROM_DATAFILE) {
       createAgentsFromDatafile(agents);
     } else {
@@ -87,7 +87,7 @@ public class World {
 
   public void createAgentsFromDatafile(int num) {
     /* Creates a certain number of agents from preprocessed data. */
-    Table simPopTable = loadTable(SIMULATED_POPULATION_DATA_FILEPATH, "header");
+    Table simPopTable = loadTable(SYNTHETIC_POPULATION_DATA_FILEPATH, "header");
     int counter = 0;
     while (counter < num) {
       for (TableRow row : simPopTable.rows()) {

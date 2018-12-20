@@ -6,7 +6,7 @@ public final String OFFICE = "0";
 public final String AMENITY = "A";
 
 // Agents wait before their next trip begins so that they do not all flow out at once (there would be too much traffic!)
-public final int TRIP_START_COUNTDOWN_MAX = 4*NUM_AGENTS_PER_WORLD;  // Wait up to this many passes
+public final int TRIP_START_COUNTDOWN_MAX = 4*NUM_AGENTS;  // Wait up to this many passes
 
 // When agents use shared transit as their travel mode, they join another vehicle (a shared AV).
 // Implementation: A new agent is not placed on the grid.
@@ -234,42 +234,20 @@ public class Agent {
     // It also depends on how far an agent must travel, the agent's mobility motif,
     // as well as personal attributes.
 
-    BuildingDistance travelDistance = world.grid.getBuildingDistance(srcBlockId, destBlockId);
 
     String[] mobilityTypes = {CAR, BIKE, PED, SHARED_TRANSIT};
     float[] mobilityChoiceProbabilities;
     if (WORLD_ID == PRIVATE_AVS_WORLD_ID) {
       // For private AVs world, mobility choice probabilities are based
       // on a model of the present world.
-      // The following decision tree is implemented below: https://github.com/CityScope/CS_activityBased/blob/master/results/mode_choice.py
-      if (travelDistance == BuildingDistance.DISTANCE_FAR) {
-        if (mobilityMotif == "RAAR") {
-          mobilityChoiceProbabilities = new float[] {0.51, 0.17, 0.01, 0.31};
-        } else {
-          mobilityChoiceProbabilities = new float[] {0.30, 0.07, 0.01, 0.62};
-        }
-      } else if (travelDistance == BuildingDistance.DISTANCE_MEDIUM_FAR) {
-        if (householdLifecycle <= 5.5) {
-          mobilityChoiceProbabilities = new float[] {0.19, 0.50, 0.09, 0.22};
-        } else {
-          mobilityChoiceProbabilities = new float[] {0.48, 0.17, 0.11, 0.24};
-        }
-      } else if (travelDistance == BuildingDistance.DISTANCE_MEDIUM_SHORT) {
-        if (mobilityMotif == "ROOR") {
-          mobilityChoiceProbabilities = new float[] {0.00, 0.84, 0.14, 0.02};
-        } else {
-          mobilityChoiceProbabilities = new float[] {0.15, 0.25, 0.56, 0.04};
-        }
-      } else {  // travelDistance == BuildingDistance.DISTANCE_SHORT
-        mobilityChoiceProbabilities = new float[] {0.04, 0.23, 0.71, 0.02};
+      // See https://github.com/CityScope/CS_activityBased
+      if (CBSA == 14460) {
+        mobilityChoiceProbabilities = getMobilityChoiceProbabilitiesForCBSA_14460();
+      } else if (CBSA == 35620) {
+        mobilityChoiceProbabilities = getMobilityChoiceProbabilitiesForCBSA_35620();
       }
     } else {
-      // Good/shared world (fictitious) probabilities:
-      if (travelDistance == BuildingDistance.DISTANCE_FAR) {
-        mobilityChoiceProbabilities = new float[] {0.07, 0.45, 0.2, 0.28};
-      } else {
-        mobilityChoiceProbabilities = new float[] {0.02, 0.51, 0.35, 0.12};
-      }
+      mobilityChoiceProbabilities = getMobilityChoiceProbabilitiesForSharedWorld();
     }
     // Transform the probability distribution into an array to randomly sample from.
     String[] mobilityChoiceDistribution = new String[100];
@@ -283,6 +261,84 @@ public class Agent {
     // Take random sample from distribution.
     int choice = int(random(100));
     return mobilityChoiceDistribution[choice];
+  }
+
+
+  private float[] getMobilityChoiceProbabilitiesForCBSA_35620() {
+      // Returns mobility choice probabilities for mobility types:
+      // {CAR, BIKE, PED, SHARED_TRANSIT}
+      // for private (real) world CBSA 35620 by implementing the decision tree generated
+      // by model: https://github.com/CityScope/CS_activityBased/blob/master/results/mode_choice.py
+    BuildingDistance travelDistance = world.grid.getBuildingDistance(srcBlockId, destBlockId);
+    if (travelDistance == BuildingDistance.DISTANCE_FAR) {
+      if (mobilityMotif == "RAAR") {
+        return new float[] {0.51, 0.17, 0.01, 0.31};
+      } else {
+        return new float[] {0.30, 0.07, 0.01, 0.62};
+      }
+    } else if (travelDistance == BuildingDistance.DISTANCE_MEDIUM_FAR) {
+      if (householdLifecycle <= 5.5) {
+        return new float[] {0.19, 0.50, 0.09, 0.22};
+      } else {
+        return new float[] {0.48, 0.17, 0.11, 0.24};
+      }
+    } else if (travelDistance == BuildingDistance.DISTANCE_MEDIUM_SHORT) {
+      if (mobilityMotif == "ROOR") {
+        return new float[] {0.00, 0.84, 0.14, 0.02};
+      } else {
+        return new float[] {0.15, 0.25, 0.56, 0.04};
+      }
+    } else {  // travelDistance == BuildingDistance.DISTANCE_SHORT
+      return new float[] {0.04, 0.23, 0.71, 0.02};
+    }
+  }
+
+
+  private float[] getMobilityChoiceProbabilitiesForCBSA_14460() {
+      // Returns mobility choice probabilities for mobility types:
+      // {CAR, BIKE, PED, SHARED_TRANSIT}
+      // for private (real) world CBSA 14460 by implementing the decision tree generated
+      // by model: https://github.com/CityScope/CS_activityBased/pull/11/commits/0ff81b46c9b9077d786333ba83679462fcc8a446
+      BuildingDistance travelDistance = world.grid.getBuildingDistance(srcBlockId, destBlockId);
+
+      if (travelDistance == BuildingDistance.DISTANCE_SHORT) {
+        if (householdIncome <= 9.5) {
+          return new float[] {0.15, 0.04, 0.76, 0.05};
+        } else {  // householdIncome > 9.5
+          return new float[] {0.09, 0.51, 0.40, 0};
+        }
+      } else if (travelDistance == BuildingDistance.DISTANCE_MEDIUM_SHORT) {
+        if (age <= 46.5) {
+          return new float[] {0.06, 0.80, 0.10, 0.04};
+        } else {  // age > 46.5
+          return new float[] {0.61, 0.01, 0.28, 0.10};
+        }
+      } else {  // travel distance is DISTANCE_FAR or DISTANCE_MEDIUM_FAR
+        if (age <= 68.5) {
+          if (travelDistance == BuildingDistance.DISTANCE_MEDIUM_FAR) {
+            return new float[] {0.29, 0.11, 0.05, 0.55};
+          } else {  // travel distance is DISTANCE_FAR
+            return new float[] {0.90, 0.00, 0.00, 0.10};
+          }
+        } else if (age <= 74.5) {
+          return new float[] {0.53, 0.47, 0.00, 0.00};
+        } else {  // age > 74.5
+          return new float[] {1.0, 0.0, 0.0, 0.0};
+        }
+      }
+  }
+
+
+  private float[] getMobilityChoiceProbabilitiesForSharedWorld() {
+      // Returns mobility choice probabilities for mobility types:
+      // {CAR, BIKE, PED, SHARED_TRANSIT}
+      // for the good/shared world (fictitious).
+      BuildingDistance travelDistance = world.grid.getBuildingDistance(srcBlockId, destBlockId);
+      if (travelDistance == BuildingDistance.DISTANCE_FAR) {
+        return new float[] {0.07, 0.45, 0.2, 0.28};
+      } else {
+        return new float[] {0.02, 0.51, 0.35, 0.12};
+      }
   }
 
 
