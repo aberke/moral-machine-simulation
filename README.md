@@ -64,7 +64,7 @@ This simulation of streets uses an agent-based model.  [An agent-based model (AB
 The simulation uses data from the 2017 National Household Survey (NHTS) responses.  This data* is used to derive a synthetic population (used as the agents), as well as a decision tree that determines the mobility choices (car/bike/walk/shared transit) for the agents in the model.
 
 For data science details and implementation, see: https://github.com/CityScope/CS_activityBased
-*The subset of data used is for people living in the New York + Newark areas (CBSA 35620).
+*The subset of data used is for people living in CBSA 14460: The Boston-Cambridge-Quincy, MA-NH metropolitan area.
 
 
 ### Agents
@@ -75,7 +75,9 @@ The model's agents are assigned attributes from the NHTS survey responses, such 
 ### Mobility Choices
 
 Agents in the model take trips within the simulated city.  They travel to and from their residences, offices, and amenities, and they make realtime mobility decisions for each trip they take: whether to travel by __private car__ vs __bike__ vs __walk__ vs __shared transit__.
-These decisions are determined by the decision tree model derived from the NHTS data.  The decision tree uses the agents' personal attributes from the data and the distance they are traveling.  The decision is also based on whether they are in the __(1) private__ vs __(2) shared__ world.
+These decisions are determined by the decision tree model derived from the NHTS data.  The decision tree uses the agents' personal attributes from the data and the distance they are traveling.  For CBSA 11460, the most prominant factors in the mobility type decision are age, household income, and distance traveling.  e.g. wealthier and older members of the modeled population are more likely to take private cars, and those traveling very far distances almost never bike or walk.  See details in `Agent.pde` code.
+
+The decision is also based on whether they are in the __(1) private__ vs __(2) shared__ world.
 
 #### Traveling in the Private vs Shared Future Worlds
 
