@@ -9,13 +9,13 @@ The simulation demonstrates ideas for a paper written at the MIT Media Lab about
 A view of 2 alternative future worlds with AVs in their streets:
 
 ![World of private AVs](output-assets/private-av-world-traffic-jam.png)
-The first future world is where AVs operate similarly to the privately owned and operated vehicles of our present streets.
+(Red background) The first future world is where AVs operate similarly to the privately owned and operated vehicles of our present streets.
 
 ![World of private AVs](output-assets/shared-av-world.png)
-The second world is where AVs are programmed to operate as shared transit, as well as always yield to bikers and pedestrians.
+(White background) The second world is where AVs are programmed to operate as shared transit, as well as always yield to bikers and pedestrians.
 
 
-The running simulation allows toggling between these two worlds.  In the first world, one can watch as the traffic of cars accumulates, as well as see how the vehicles do not wait for pedestrians and bikers at intersections.
+The running simulation allows toggling between these two worlds.  In the first world, one can watch as the traffic of cars accumulates, as well as see how the vehicles do not always wait for pedestrians and bikers at intersections.
 In the second world, the movements on the streets change.  The vehicles always yield to bikers and pedestrians.  More people choose to take shared transit, or bike or walk, and the congestion on the streets eases.
 [Watch a recording of the running simulation](output-assets/simulation-toggled-between-worlds-mid-way.mp4) or run it yourself (see below).
 
@@ -24,7 +24,7 @@ In the second world, the movements on the streets change.  The vehicles always y
 
 ### Credit
 
-This project is a fork of work done by the City Science team at MIT's Media Lab.  It originated as an interactive physical table + simulation for an exhibition at the [Cooper Hewitt Museum](https://www.cooperhewitt.org/2018/11/08/cooper-hewitt-explores-the-future-of-mobility-in-new-exhibition/).
+This project is a fork of work done by the City Science team at MIT's Media Lab.  It originated as an interactive physical table + simulation for an [exhibition at the Cooper Hewitt Museum](https://www.media.mit.edu/events/media-lab-projects-at-the-cooper-hewitt/).
 
 Much credit goes to:
 *(in alphabetical order)*
@@ -58,10 +58,10 @@ A world where AVs operate as shared transit.  They are programmed with new prior
 
 # Agent-based Model for this Simulation of Streets
 
-City streets can be viewed as autonomous systems.  At any given time, there are countless independent, asynchronous decisions being made by the people that move upon them.  These independent decisions aggregate into predictable mobility patterns on the streets with a variety of determining factors: the topology of streets and the rules that govern them, commuting patterns, incentives to take public transit vs private car vs walk, etc.
+City streets can be viewed as autonomous systems.  At any given time, there are countless independent, asynchronous decisions being made by the people that move upon them.  These independent decisions aggregate into predictable mobility patterns on the streets with a variety of determining factors: the topology of streets and the rules that govern them, commuting patterns, incentives to take public transit vs private car vs walk, and other mechanisms that determine individual behaviors.
 
-This simulation of streets uses an agent-based model.  [An agent-based model (ABM) is a class of computational models for simulating the actions and interactions of autonomous agents (both individual or collective entities such as organizations or groups) with a view to assessing their effects on the system as a whole.](https://en.wikipedia.org/wiki/Agent-based_model).  In this simulation, each car/bike/pedestrian is the visualization of a (human) agent's behavior within the model.
-The data for the agent model is from people's responses to the US census and National Household Travel Survey.  The subset of data used is for people living in the New York + Newark areas.  For data science details see https://github.com/CityScope/CS_activityBased
+This simulation of streets uses an agent-based model.  [An agent-based model (ABM) is a class of computational models for simulating the actions and interactions of autonomous agents with a view to assessing their effects on the system as a whole.](https://en.wikipedia.org/wiki/Agent-based_model).  In this simulation, each car/bike/pedestrian is the visualization of a (human) agent's behavior within the model.
+The data for the agent model is from people's responses to the National Household Travel Survey.  The subset of data used is for people living in the New York + Newark areas (CBSA 35620).  For data science details see https://github.com/CityScope/CS_activityBased
 
 Agents in the model take trips within the simulated city.  They travel to and from their residences, offices, and amenities.  These agents make realtime mobility decisions for each trip they take: whether to travel by private car, shared transit, bike, or as pedestrians.
 These decisions are determined by the agents' personal attributes from the data, the distance they are traveling, and whether they are in the __(1) private__ vs __(2) shared__ world.
