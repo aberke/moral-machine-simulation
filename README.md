@@ -75,7 +75,7 @@ The model's agents are assigned attributes from the NHTS survey responses, such 
 ### Mobility Choices
 
 Agents in the model take trips within the simulated city.  They travel to and from their residences, offices, and amenities, and they make realtime mobility decisions for each trip they take: whether to travel by __private car__ vs __bike__ vs __walk__ vs __shared transit__.
-These decisions are determined by the decision tree model derived from the NHTS data.  The decision tree uses the agents' personal attributes from the data and the distance they are traveling.  The decision also based on whether they are in the __(1) private__ vs __(2) shared__ world.
+These decisions are determined by the decision tree model derived from the NHTS data.  The decision tree uses the agents' personal attributes from the data and the distance they are traveling.  The decision is also based on whether they are in the __(1) private__ vs __(2) shared__ world.
 
 #### Traveling in the Private vs Shared Future Worlds
 
