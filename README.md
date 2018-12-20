@@ -61,7 +61,7 @@ A world where AVs operate as shared transit.  They are programmed with new prior
 City streets can be viewed as autonomous systems.  At any given time, there are countless independent, asynchronous decisions being made by the people that move upon them.  These independent decisions aggregate into predictable mobility patterns on the streets with a variety of determining factors: the topology of streets and the rules that govern them, commuting patterns, incentives to take public transit vs private car vs walk, and other mechanisms that determine individual behaviors.
 
 This simulation of streets uses an agent-based model.  [An agent-based model (ABM) is a class of computational models for simulating the actions and interactions of autonomous agents with a view to assessing their effects on the system as a whole.](https://en.wikipedia.org/wiki/Agent-based_model).  In this simulation, each car/bike/pedestrian is the visualization of a (human) agent's behavior within the model.
-The simulation uses data from the 2018 National Household Survey (NHTS) responses.  This data* is used to derive a synthetic population (used as the agents), as well as a decision tree that determines the mobility choices (car/bike/walk/shared transit) for the agents in the model.
+The simulation uses data from the 2017 National Household Survey (NHTS) responses.  This data* is used to derive a synthetic population (used as the agents), as well as a decision tree that determines the mobility choices (car/bike/walk/shared transit) for the agents in the model.
 
 For data science details and implementation, see: https://github.com/CityScope/CS_activityBased
 *The subset of data used is for people living in the New York + Newark areas (CBSA 35620).
